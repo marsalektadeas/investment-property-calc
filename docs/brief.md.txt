@@ -1,0 +1,224 @@
+1. Přehled projektu
+
+Cílem je vytvořit webovou aplikaci pro výpočet výnosnosti investice do nemovitosti.
+
+Aplikace bude sloužit jako nástroj pro investory, kteří chtějí:
+
+vyhodnotit konkrétní investici
+pochopit cashflow
+vidět vývoj v čase
+rozhodnout se, zda investice dává smysl
+
+Aplikace musí pracovat realisticky (obsazenost, náklady, inflace, daně).
+
+2. Cílový uživatel
+Investor do nemovitostí (začátečník i pokročilý)
+Věk cca 25–50 let
+Zajímá ho:
+cashflow
+návratnost
+riziko
+dlouhodobé zhodnocení
+3. Hlavní cíle aplikace
+
+Aplikace musí odpovědět na 4 klíčové otázky:
+
+Kolik mě stojí investice z vlastní kapsy?
+Kolik mi generuje měsíčně a ročně?
+Jak se investice vyvíjí v čase?
+Kolik vydělám při prodeji?
+4. Vstupní parametry
+4.1 Nemovitost a pořízení
+Cena nemovitosti
+Vlastní kapitál (akontace)
+LTV (%)
+Pořizovací náklady:
+právní služby
+provize RK
+poplatky (katastr, odhad, úvěr…)
+Náklady na rekonstrukci / vybavení
+Počáteční finanční rezerva
+4.2 Hypotéka
+Úroková sazba (%)
+Fixace (roky)
+Doba splatnosti (roky)
+Typ splácení:
+anuitní (default)
+Očekávaná sazba po fixaci
+Rok začátku úvěru
+4.3 Příjmy z nájmu
+Měsíční nájem
+Neobsazenost (vacancy % nebo měsíce/rok)
+Další příjmy (parkování apod.)
+Roční růst nájmu (%)
+Frekvence navyšování nájmu
+4.4 Provozní náklady
+Fixní náklady:
+Fond oprav
+Pojištění
+Daň z nemovitosti
+Poplatky SVJ / správa
+Správa nemovitosti
+Variabilní náklady:
+Opravy (ročně)
+Náklady na výměnu nájemníka
+Právní / neočekávané náklady
+4.5 Daně
+Sazba daně z příjmu (%)
+Režim:
+skutečné náklady
+paušál
+Odpisy (ano/ne)
+4.6 Makro faktory
+Inflace (%)
+Růst ceny nemovitosti (% ročně)
+4.7 Prodej (exit)
+Doba držení (roky)
+Náklady na prodej (%)
+Daň při prodeji (%)
+5. Výpočty
+5.1 Hypotéka
+Výpočet měsíční splátky
+Rozpad na úrok a jistinu
+Zůstatek úvěru v čase
+5.2 Cashflow
+Měsíční cashflow:
+nájem − náklady − hypotéka
+Roční cashflow
+5.3 NOI (čistý provozní výnos)
+Příjmy − náklady (bez hypotéky)
+5.4 Klíčové metriky
+Cap rate
+Cash-on-cash return
+ROI
+DSCR
+Break-even point
+Doba návratnosti
+5.5 Vývoj v čase (ročně)
+
+Pro každý rok:
+
+Nájem (upravený)
+Náklady
+Zůstatek hypotéky
+Zaplacené úroky
+Splacená jistina
+Hodnota nemovitosti
+Cashflow
+Kumulované cashflow
+Equity (hodnota − dluh)
+5.6 Inflace
+
+Zobrazit:
+
+nominální hodnoty
+reálné hodnoty (po inflaci)
+5.7 Výpočet při prodeji
+Odhad ceny nemovitosti
+Zůstatek hypotéky
+Náklady na prodej
+Čistý zisk z prodeje
+Celkový zisk (prodej + cashflow)
+6. Scénáře
+
+Možnost přepínání:
+
+Konzervativní
+Realistický
+Optimistický
+
+Scénáře upravují:
+
+růst nájmu
+růst ceny
+neobsazenost
+náklady
+úrokovou sazbu
+7. Výstupy (UI)
+7.1 Shrnutí
+Měsíční cashflow
+Roční výnos
+ROI
+Equity po X letech
+7.2 Grafy
+Cashflow v čase
+Hodnota vs dluh
+Růst equity
+Nájem vs splátka (kdy se potkají)
+7.3 Tabulka
+
+Přehled po letech:
+
+nájem
+náklady
+hypotéka
+cashflow
+equity
+8. UX požadavky
+Slidery + ruční input
+Okamžitý přepočet
+Přepínače:
+s / bez inflace
+před / po zdanění
+Moderní minimalistický design
+Responsivní (mobile)
+9. Pokročilé funkce (nice to have)
+Porovnání více nemovitostí
+Export do PDF
+Sdílení přes odkaz
+Uložení scénářů
+Přepínání měny (CZK / EUR)
+10. Technologie
+
+Frontend:
+
+Next.js
+Tailwind CSS
+
+Logika:
+
+čistý JavaScript / TypeScript (modulární)
+
+Grafy:
+
+Recharts nebo podobná knihovna
+11. Struktura kódu
+/components
+  InputSection
+  ResultsSummary
+  Charts
+  Tables
+
+/lib
+  mortgage.ts
+  cashflow.ts
+  metrics.ts
+  scenarios.ts
+
+/utils
+  format.ts
+  inflation.ts
+
+/pages
+  index.tsx
+12. Principy
+Oddělení logiky a UI
+Přehledný a čistý kód
+Okamžité přepočty
+Reusability funkcí
+13. Očekávaný výstup od Claude Code
+Plně funkční webová aplikace
+Moderní UI
+Přesný výpočetní engine
+Modulární struktura
+Připraveno na nasazení
+14. Důležité poznámky
+Výpočty musí být realistické (žádná zjednodušení)
+Hypotéka musí být správně počítaná (amortizace)
+Ošetřit edge cases:
+negativní cashflow
+vysoká neobsazenost
+růst úroků
+15. Finální instrukce
+
+Vytvoř produkční kalkulačku investiční nemovitosti, která pomáhá dělat reálná investiční rozhodnutí, ne jen jednoduchou kalkulačku.
