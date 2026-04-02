@@ -24,14 +24,14 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="text-base font-semibold text-gray-900">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-base font-semibold text-gray-900 truncate">
               Kalkulačka investiční nemovitosti
             </h1>
             <p className="text-xs text-gray-400">Realistický výpočet výnosnosti</p>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-5 shrink-0">
             <Toggle
               label="Po inflaci"
               checked={params.showInflationAdjusted}
@@ -53,9 +53,9 @@ export default function Home() {
       </header>
 
       {/* Main layout: inputs left, results right */}
-      <div className="max-w-[1400px] mx-auto px-6 py-6 flex gap-6 items-start">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col lg:flex-row gap-6 items-start">
         {/* Left column — inputs */}
-        <div className="w-[380px] flex-shrink-0 space-y-3">
+        <div className="w-full lg:w-[380px] lg:flex-shrink-0 space-y-3">
           <ScenarioSelector />
           <PropertyInputs />
           <MortgageInputs />
@@ -67,9 +67,9 @@ export default function Home() {
         </div>
 
         {/* Right column — results */}
-        <div className="flex-1 min-w-0 space-y-4">
+        <div className="flex-1 min-w-0 w-full space-y-4">
           <SummaryCards />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <CashflowChart />
             <EquityChart />
           </div>

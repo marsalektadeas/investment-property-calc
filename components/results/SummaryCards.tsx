@@ -30,7 +30,7 @@ export function SummaryCards() {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <MetricCard
           label="Cap Rate"
           value={formatPercent(metrics.capRate)}
@@ -54,7 +54,7 @@ export function SummaryCards() {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <MetricCard
           label="NOI (roční)"
           value={formatCZK(metrics.noi)}
