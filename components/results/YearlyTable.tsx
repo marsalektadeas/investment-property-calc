@@ -23,7 +23,7 @@ export function YearlyTable() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
-              <th className="px-4 py-3 text-left">Rok</th>
+              <th className="px-4 py-3 text-left sticky left-0 bg-gray-50 z-10">Rok</th>
               <th className="px-4 py-3 text-right">Nájem</th>
               <th className="px-4 py-3 text-right">Náklady</th>
               <th className="px-4 py-3 text-right">Hypotéka</th>
@@ -41,7 +41,7 @@ export function YearlyTable() {
 
               return (
                 <tr key={p.year} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                  <td className="px-4 py-2.5 font-medium text-gray-900">{p.year}</td>
+                  <td className={`px-4 py-2.5 font-medium text-gray-900 sticky left-0 z-10 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>{p.year}</td>
                   <td className="px-4 py-2.5 text-right text-gray-700">
                     {formatCZK(p.effectiveRent)}
                   </td>

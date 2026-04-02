@@ -49,6 +49,7 @@ export function CashflowChart() {
           )}
         </div>
       </div>
+      <div className="w-full overflow-hidden">
       <ResponsiveContainer width="100%" height={240}>
         <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
           <defs>
@@ -88,6 +89,7 @@ export function CashflowChart() {
           />
         </AreaChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }

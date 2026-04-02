@@ -28,6 +28,7 @@ export function EquityChart() {
       <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
         Hodnota nemovitosti vs dluh
       </h3>
+      <div className="w-full overflow-hidden">
       <ResponsiveContainer width="100%" height={240}>
         <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
           <defs>
@@ -85,6 +86,7 @@ export function EquityChart() {
           />
         </AreaChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }
