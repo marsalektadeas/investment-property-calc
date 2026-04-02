@@ -21,7 +21,7 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
 
 export function ExitSummary() {
   const { result, params } = useCalculatorStore()
-  const { exit } = result
+  const { exit, alternative } = result
 
   return (
     <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
@@ -59,6 +59,41 @@ export function ExitSummary() {
                 {formatPercent(exit.annualizedROI, 1)}
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Srovnání s alternativní investicí */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            Srovnání s alternativou ({params.exit.alternativeReturnRate} % p.a.)
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-blue-50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">Nemovitost — celkem</p>
+              <p className="text-base font-bold text-blue-700">
+                {formatCZK(exit.netSaleProfit + exit.totalCashflow)}
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                prodej + cashflow
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">Alternativa — celkem</p>
+              <p className="text-base font-bold text-gray-700">
+                {formatCZK(alternative.finalPortfolio)}
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                složené úročení + CF korekce
+              </p>
+            </div>
+          </div>
+          <div className={`mt-3 rounded-lg p-3 text-center ${alternative.advantage >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
+            <p className="text-xs text-gray-500 mb-1">
+              {alternative.advantage >= 0 ? 'Nemovitost vydělá navíc' : 'Alternativa vydělá navíc'}
+            </p>
+            <p className={`text-lg font-bold ${alternative.advantage >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {formatCZK(Math.abs(alternative.advantage))}
+            </p>
           </div>
         </div>
       </div>

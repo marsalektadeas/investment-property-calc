@@ -39,6 +39,17 @@ export function ExitInputs() {
         onChange={(v) => setExit({ capitalGainsTax: v })}
         hint="Po 5 letech 0 %"
       />
+      <SliderInput
+        label="Výnos alternativy"
+        value={exit.alternativeReturnRate}
+        min={0}
+        max={20}
+        step={0.5}
+        unit="%"
+        decimals={1}
+        onChange={(v) => setExit({ alternativeReturnRate: v })}
+        hint="Spořák / akcie — ročně (p.a.)"
+      />
     </SectionCard>
   )
 }

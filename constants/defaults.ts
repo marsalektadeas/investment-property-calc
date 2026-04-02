@@ -43,6 +43,7 @@ export const DEFAULT_PARAMS: InputParams = {
     holdingYears: 10,
     sellingCosts: 3,
     capitalGainsTax: 0,         // po 5 letech osvobozeno
+    alternativeReturnRate: 7,   // % ročně (akciový trh)
   },
   scenario: 'realistic',
   showInflationAdjusted: false,

@@ -17,6 +17,7 @@ import { calcMonthlyCashflow } from '@/lib/cashflow'
 import { calcMetrics } from '@/lib/metrics'
 import { buildProjections } from '@/lib/projections'
 import { calcExit } from '@/lib/exit'
+import { calcAlternative } from '@/lib/alternative'
 import { applyScenario } from '@/lib/scenarios'
 
 interface CalculatorStore {
@@ -62,7 +63,16 @@ function calculate(params: InputParams): CalculationResult {
   const metrics = calcMetrics(adjustedParams, mortgage, monthly, projections)
   const exit = calcExit(adjustedParams, projections, initialInvestment)
 
-  return { mortgage, monthly, metrics, projections, exit }
+  const alternativeRaw = calcAlternative(
+    initialInvestment,
+    projections,
+    adjustedParams.exit.alternativeReturnRate,
+    adjustedParams.exit.holdingYears,
+  )
+  const propertyFinalWealth = exit.netSaleProfit + exit.totalCashflow
+  const alternative = { ...alternativeRaw, advantage: propertyFinalWealth - alternativeRaw.finalPortfolio }
+
+  return { mortgage, monthly, metrics, projections, exit, alternative }
 }
 
 const initialResult = calculate(DEFAULT_PARAMS)

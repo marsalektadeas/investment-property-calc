@@ -48,6 +48,7 @@ export interface ExitParams {
   holdingYears: number
   sellingCosts: number          // % z prodejní ceny
   capitalGainsTax: number       // % ze zisku
+  alternativeReturnRate: number // % ročně (alternativní investice)
 }
 
 export type ScenarioType = 'conservative' | 'realistic' | 'optimistic'
@@ -139,10 +140,19 @@ export interface ExitResult {
   annualizedROI: number         // % ročně (CAGR)
 }
 
+export interface AlternativeResult {
+  finalPortfolio: number        // hodnota portfolia na konci
+  totalReturn: number           // zisk oproti počáteční investici
+  totalROI: number              // % z počáteční investice
+  annualizedROI: number         // % ročně (CAGR)
+  advantage: number             // nemovitost − alternativa (kladné = nem. vyhrává)
+}
+
 export interface CalculationResult {
   mortgage: MortgageResult
   monthly: MonthlyCashflow
   metrics: KeyMetrics
   projections: YearlyProjection[]
   exit: ExitResult
+  alternative: AlternativeResult
 }
