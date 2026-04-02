@@ -41,7 +41,7 @@ export function ExitSummary() {
 
         <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">Celkový výnos</span>
+            <span className="text-sm font-medium text-gray-700">Čistý zisk (nad vloženou investicí)</span>
             <span className={`text-lg font-bold ${exit.totalReturn >= 0 ? 'text-green-600' : 'text-red-500'}`}>
               {formatCZK(exit.totalReturn)}
             </span>
@@ -69,16 +69,16 @@ export function ExitSummary() {
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 rounded-lg p-3">
-              <p className="text-xs text-gray-500 mb-1">Nemovitost — celkem</p>
+              <p className="text-xs text-gray-500 mb-1">Nemovitost — na účtu</p>
               <p className="text-base font-bold text-blue-700">
                 {formatCZK(exit.netSaleProfit + exit.totalCashflow)}
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
-                prodej + cashflow
+                výtěžek z prodeje + cashflow
               </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-xs text-gray-500 mb-1">Alternativa — celkem</p>
+              <p className="text-xs text-gray-500 mb-1">Alternativa — na účtu</p>
               <p className="text-base font-bold text-gray-700">
                 {formatCZK(alternative.finalPortfolio)}
               </p>
