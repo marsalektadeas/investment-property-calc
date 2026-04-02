@@ -8,7 +8,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts'
 import { useCalculatorStore } from '@/store/useCalculatorStore'
 import { formatCZKShort, formatCZK } from '@/utils/format'
@@ -54,15 +53,6 @@ export function EquityChart() {
                   : 'Equity',
             ]}
           />
-          <Legend
-            formatter={(v) =>
-              v === 'propertyValue'
-                ? 'Hodnota nemovitosti'
-                : v === 'loanBalance'
-                  ? 'Zůstatek úvěru'
-                  : 'Equity'
-            }
-          />
           <Area
             type="monotone"
             dataKey="propertyValue"
@@ -86,6 +76,11 @@ export function EquityChart() {
           />
         </AreaChart>
       </ResponsiveContainer>
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
+        <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-0.5 bg-blue-600 rounded" />Hodnota nemovitosti</span>
+        <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-0.5 bg-red-500 rounded" />Zůstatek úvěru</span>
+        <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-0.5 bg-green-600 rounded" />Equity</span>
       </div>
     </div>
   )

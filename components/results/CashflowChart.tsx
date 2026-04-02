@@ -9,7 +9,6 @@ import {
   Tooltip,
   ReferenceLine,
   ResponsiveContainer,
-  Legend,
 } from 'recharts'
 import { useCalculatorStore } from '@/store/useCalculatorStore'
 import { formatCZKShort, formatCZK } from '@/utils/format'
@@ -71,7 +70,6 @@ export function CashflowChart() {
               name === 'cashflow' ? cashflowLabel : cumulativeLabel,
             ]}
           />
-          <Legend formatter={(v) => (v === 'cashflow' ? cashflowLabel : cumulativeLabel)} />
           <ReferenceLine y={0} stroke="#ef4444" strokeDasharray="4 4" />
           <Area
             type="monotone"
@@ -89,6 +87,10 @@ export function CashflowChart() {
           />
         </AreaChart>
       </ResponsiveContainer>
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
+        <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-0.5 bg-blue-600 rounded" />{cashflowLabel}</span>
+        <span className="flex items-center gap-1.5"><span className="inline-block w-3 h-0.5 bg-green-600 rounded" />{cumulativeLabel}</span>
       </div>
     </div>
   )
