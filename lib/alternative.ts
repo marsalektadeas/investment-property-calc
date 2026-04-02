@@ -22,6 +22,12 @@ export function calcAlternative(
   const rate = returnRate / 100
   let portfolio = initialInvestment
 
+  for (let y = 0; y < holdingYears; y++) {
+    portfolio *= 1 + rate
+    const cashflow = projections[y]?.netCashflow ?? 0
+    portfolio -= cashflow
+  }
+
   const totalReturn = portfolio - initialInvestment
   const totalROI = (totalReturn / initialInvestment) * 100
   const cumulativeMultiple = portfolio / initialInvestment
