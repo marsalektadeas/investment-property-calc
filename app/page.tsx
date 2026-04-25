@@ -47,10 +47,12 @@ export default function Home() {
     const payload = {
       metrics: result.metrics,
       exit: result.exit,
+      alternative: result.alternative,
       params: {
         purchasePrice: params.property.purchasePrice,
         interestRate: params.mortgage.interestRate,
         holdingYears: params.exit.holdingYears,
+        alternativeReturnRate: params.exit.alternativeReturnRate,
         scenario: params.scenario,
       },
       savedAt: new Date().toISOString(),
