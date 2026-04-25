@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useCalculatorStore } from '@/store/useCalculatorStore'
 import { ScenarioSelector } from '@/components/inputs/ScenarioSelector'
 import { PropertyInputs } from '@/components/inputs/PropertyInputs'
@@ -17,8 +18,59 @@ import { YearlyTable } from '@/components/results/YearlyTable'
 import { Toggle } from '@/components/ui/Toggle'
 
 export default function Home() {
-  const { params, setShowInflationAdjusted, setShowAfterTax, resetToDefaults } =
+  const { params, result, setProperty, setShowInflationAdjusted, setShowAfterTax, resetToDefaults } =
     useCalculatorStore()
+
+  const [propertyId, setPropertyId] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search)
+    const price = sp.get('price')
+    const pid = sp.get('propertyId')
+    const tok = sp.get('token')
+
+    if (price) setProperty({ purchasePrice: Number(price) })
+    if (pid) setPropertyId(pid)
+    if (tok) setToken(tok)
+  }, [setProperty])
+
+  async function handleSaveToBuyFlat() {
+    if (!propertyId || !token) return
+    setSaving(true)
+
+    const payload = {
+      metrics: result.metrics,
+      exit: result.exit,
+      params: {
+        purchasePrice: params.property.purchasePrice,
+        interestRate: params.mortgage.interestRate,
+        holdingYears: params.exit.holdingYears,
+        scenario: params.scenario,
+      },
+      savedAt: new Date().toISOString(),
+    }
+
+    try {
+      const res = await fetch(`https://buyflat.vercel.app/api/properties/${propertyId}/calculator`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-buyflat-token': token,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (res.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      }
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -48,6 +100,19 @@ export default function Home() {
             >
               Reset
             </button>
+            {propertyId && (
+              <button
+                onClick={handleSaveToBuyFlat}
+                disabled={saving || saved}
+                className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                  saved
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-gray-900 text-white hover:bg-gray-700'
+                }`}
+              >
+                {saved ? '✓ Uloženo do BuyFlat' : saving ? 'Ukládám...' : 'Uložit do BuyFlat'}
+              </button>
+            )}
           </div>
         </div>
       </header>
