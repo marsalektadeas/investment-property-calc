@@ -23,6 +23,7 @@ export default function Home() {
 
   const [propertyId, setPropertyId] = useState<string | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [supabaseToken, setSupabaseToken] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -31,10 +32,12 @@ export default function Home() {
     const price = sp.get('price')
     const pid = sp.get('propertyId')
     const tok = sp.get('token')
+    const stok = sp.get('supabaseToken')
 
     if (price) setProperty({ purchasePrice: Number(price) })
     if (pid) setPropertyId(pid)
     if (tok) setToken(tok)
+    if (stok) setSupabaseToken(stok)
   }, [setProperty])
 
   async function handleSaveToBuyFlat() {
@@ -53,13 +56,16 @@ export default function Home() {
       savedAt: new Date().toISOString(),
     }
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'x-buyflat-token': token,
+    }
+    if (supabaseToken) headers['x-supabase-token'] = supabaseToken
+
     try {
       const res = await fetch(`https://buyflat.vercel.app/api/properties/${propertyId}/calculator`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-buyflat-token': token,
-        },
+        headers,
         body: JSON.stringify(payload),
       })
 
