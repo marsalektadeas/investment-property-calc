@@ -16,7 +16,10 @@ export function calcMetrics(
   // NOI (roční, rok 1)
   const annualNOI = monthly.noi * 12
 
-  // Cap Rate = NOI / Purchase Price
+  // Hrubá výnosnost = hrubý roční nájem / cena nemovitosti
+  const grossYield = (monthly.grossRent * 12 / property.purchasePrice) * 100
+
+  // Cap Rate = NOI / Purchase Price (= čistá výnosnost)
   const capRate = (annualNOI / property.purchasePrice) * 100
 
   // Cash-on-Cash Return = roční čistý cashflow / počáteční investice
@@ -55,6 +58,7 @@ export function calcMetrics(
     monthlyCashflow: monthly.cashflow,
     annualCashflow: annualNetCashflow,
     noi: annualNOI,
+    grossYield,
     capRate,
     cashOnCash,
     roi,

@@ -117,7 +117,8 @@ export interface KeyMetrics {
   monthlyCashflow: number
   annualCashflow: number
   noi: number
-  capRate: number               // %
+  grossYield: number            // % hrubý nájem / cena
+  capRate: number               // % NOI / cena (= čistá výnosnost)
   cashOnCash: number            // %
   roi: number                   // %
   dscr: number

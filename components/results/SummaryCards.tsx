@@ -30,13 +30,20 @@ export function SummaryCards() {
         />
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <MetricCard
-          label="Cap Rate"
+          label="Hrubá výnosnost"
+          value={formatPercent(metrics.grossYield)}
+          sub="hrubý nájem / cena"
+          positive={metrics.grossYield >= 5}
+          tooltip="Roční hrubý nájem dělený cenou nemovitosti. Nejjednodušší pohled — nezohledňuje neobsazenost ani náklady. Dobré: 5 %+ v ČR."
+        />
+        <MetricCard
+          label="Čistá výnosnost"
           value={formatPercent(metrics.capRate)}
           sub="NOI / cena"
           positive={metrics.capRate >= 4}
-          tooltip="Capitalization Rate — roční čistý provozní výnos (bez hypotéky) dělený cenou nemovitosti. Říká, kolik % by nemovitost vydělala bez páky. Dobré: 4–6 % v ČR."
+          tooltip="Roční čistý provozní výnos (po neobsazenosti a nákladech, bez hypotéky) dělený cenou nemovitosti. Říká, kolik % by nemovitost vydělala bez páky. Dobré: 4–6 % v ČR."
         />
         <MetricCard
           label="Cash-on-Cash"
