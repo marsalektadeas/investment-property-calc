@@ -16,6 +16,8 @@ import { EquityChart } from '@/components/results/EquityChart'
 import { ExitSummary } from '@/components/results/ExitSummary'
 import { YearlyTable } from '@/components/results/YearlyTable'
 import { Toggle } from '@/components/ui/Toggle'
+import { formatCZK, formatPercent } from '@/utils/format'
+import { SCENARIO_LABELS } from '@/constants/scenarios'
 
 export default function Home() {
   const { params, result, setProperty, setShowInflationAdjusted, setShowAfterTax, resetToDefaults } =
@@ -80,15 +82,72 @@ export default function Home() {
     }
   }
 
+  const loanAmount = params.property.purchasePrice - params.property.equity
+  const ltv = params.property.purchasePrice > 0
+    ? (loanAmount / params.property.purchasePrice) * 100
+    : 0
+
+  const printParams: [string, string][] = [
+    ['Cena nemovitosti', formatCZK(params.property.purchasePrice)],
+    ['Vlastní kapitál', formatCZK(params.property.equity)],
+    ['LTV', formatPercent(ltv, 0)],
+    ['Úroková sazba', formatPercent(params.mortgage.interestRate)],
+    ['Splatnost', `${params.mortgage.termYears} let`],
+    ['Fixace', `${params.mortgage.fixationYears} let`],
+    ['Měsíční nájem', formatCZK(params.rental.monthlyRent)],
+    ['Neobsazenost', formatPercent(params.rental.vacancyRate, 0)],
+    ['Růst nájmu', formatPercent(params.rental.annualRentGrowth)],
+    ['Inflace', formatPercent(params.macro.inflation)],
+    ['Růst ceny nem.', formatPercent(params.macro.propertyGrowthRate)],
+    ['Daňový režim', params.tax.regime === 'pausal' ? 'Paušál 30 %' : 'Skutečné náklady'],
+  ]
+
   return (
     <div className="min-h-screen bg-[#f9f7f4]">
-      {/* Header */}
-      <header className="bg-[#111111] sticky top-0 z-10">
+
+      {/* ── Print-only header ─────────────────────────────────────────────────── */}
+      <div className="hidden print:block px-0 pt-0">
+        {/* Gold top bar */}
+        <div className="h-[4px] bg-[#C9A84C] mb-5" />
+        <div className="flex items-start justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full border-2 border-[#111111] flex items-center justify-center flex-shrink-0">
+              <span className="text-[#111111] font-bold text-base leading-none">A</span>
+            </div>
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-[#111111] font-bold text-lg tracking-widest uppercase">Anomia</span>
+                <span className="text-gray-400 text-xs uppercase tracking-wider">Real Estate</span>
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5">Kalkulačka investiční nemovitosti</p>
+            </div>
+          </div>
+          <div className="text-right text-xs text-gray-500 space-y-0.5">
+            <p className="font-semibold text-gray-800 text-sm">{formatCZK(params.property.purchasePrice)}</p>
+            <p>{SCENARIO_LABELS[params.scenario]} scénář · {params.exit.holdingYears} let</p>
+            <p className="text-gray-400">Vygenerováno: {new Date().toLocaleDateString('cs-CZ')}</p>
+          </div>
+        </div>
+
+        {/* Parameters summary grid */}
+        <div className="grid grid-cols-4 gap-2 mb-6">
+          {printParams.map(([label, value]) => (
+            <div key={label} className="bg-[#f9f7f4] border border-[#ede9e2] rounded-lg px-3 py-2">
+              <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
+              <p className="font-semibold text-gray-800 text-xs">{value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="border-t border-[#ede9e2] mb-5" />
+      </div>
+
+      {/* ── Screen header ─────────────────────────────────────────────────────── */}
+      <header className="bg-[#111111] sticky top-0 z-10 print:hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           {/* Logo + title */}
           <div className="flex items-center justify-between gap-3 min-w-0">
             <div className="flex items-center gap-3 min-w-0">
-              {/* Logo mark */}
               <div className="w-8 h-8 rounded-full border border-[#C9A84C] flex items-center justify-center flex-shrink-0">
                 <span className="text-[#C9A84C] text-sm font-bold leading-none">A</span>
               </div>
@@ -114,7 +173,7 @@ export default function Home() {
               </button>
             )}
           </div>
-          {/* Toggles + reset */}
+          {/* Toggles + PDF + reset */}
           <div className="flex items-center gap-3 sm:gap-5 shrink-0">
             <Toggle
               label="Po inflaci"
@@ -129,6 +188,12 @@ export default function Home() {
               className="text-gray-400 hover:text-white"
             />
             <button
+              onClick={() => window.print()}
+              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-600 text-gray-400 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors"
+            >
+              PDF
+            </button>
+            <button
               onClick={resetToDefaults}
               className="text-xs text-gray-600 hover:text-gray-300 underline underline-offset-2 transition-colors"
             >
@@ -138,10 +203,10 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main layout */}
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col lg:flex-row gap-6 items-start">
-        {/* Left column — inputs */}
-        <div className="w-full lg:w-[380px] lg:flex-shrink-0 space-y-3">
+      {/* ── Main layout ───────────────────────────────────────────────────────── */}
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 sm:py-6 print:px-0 print:py-0 flex flex-col lg:flex-row gap-6 items-start">
+        {/* Left column — hidden in print */}
+        <div className="w-full lg:w-[380px] lg:flex-shrink-0 space-y-3 print:hidden">
           <ScenarioSelector />
           <PropertyInputs />
           <MortgageInputs />
@@ -154,13 +219,20 @@ export default function Home() {
 
         {/* Right column — results */}
         <div className="flex-1 min-w-0 w-full space-y-4">
-          <SummaryCards />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="print-avoid-break">
+            <SummaryCards />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print-avoid-break">
             <CashflowChart />
             <EquityChart />
           </div>
-          <ExitSummary />
-          <YearlyTable />
+          <div className="print-avoid-break">
+            <ExitSummary />
+          </div>
+          {/* YearlyTable: starts on new page in print */}
+          <div className="print:break-before-page">
+            <YearlyTable />
+          </div>
         </div>
       </div>
     </div>

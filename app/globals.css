@@ -28,3 +28,56 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ─── Print styles ──────────────────────────────────────────────────────────── */
+@media print {
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm;
+  }
+
+  body {
+    background: white !important;
+    font-size: 11px !important;
+  }
+
+  /* Charts: ensure ResponsiveContainer renders correctly */
+  .recharts-responsive-container {
+    width: 100% !important;
+    min-height: 200px;
+  }
+
+  /* Keep cards and chart panels together */
+  .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Table rows should not split across pages */
+  tbody tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Repeat table header on each page */
+  thead {
+    display: table-header-group;
+  }
+
+  /* Remove overflow-x-auto so table prints full-width */
+  .overflow-x-auto {
+    overflow: visible !important;
+  }
+
+  /* Sticky cells: reset to static in print */
+  .sticky {
+    position: static !important;
+  }
+}

@@ -8,13 +8,14 @@ export function YearlyTable() {
   const { result, params } = useCalculatorStore()
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-      <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">
+    <div className="bg-white border border-[#ede9e2] rounded-xl shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-[#ede9e2] flex items-center justify-between">
+        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+          <span className="w-0.5 h-3.5 bg-[#C9A84C] rounded-full flex-shrink-0" />
           Přehled po letech
         </h3>
         {params.showInflationAdjusted && (
-          <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+          <span className="text-xs text-[#8B6B1A] bg-[#f5edda] px-2 py-0.5 rounded-full">
             cashflow po inflaci
           </span>
         )}
@@ -22,8 +23,8 @@ export function YearlyTable() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
-              <th className="px-4 py-3 text-left sticky left-0 bg-gray-50 z-10">Rok</th>
+            <tr className="bg-[#f9f7f4] text-gray-500 text-xs uppercase tracking-wide">
+              <th className="px-4 py-3 text-left sticky left-0 bg-[#f9f7f4] z-10">Rok</th>
               <th className="px-4 py-3 text-right">Nájem</th>
               <th className="px-4 py-3 text-right">Náklady</th>
               <th className="px-4 py-3 text-right">Hypotéka</th>
@@ -34,14 +35,16 @@ export function YearlyTable() {
               <th className="px-4 py-3 text-right">Hodnota nem.</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-[#f5f2ed]">
             {result.projections.map((p, i) => {
               const cashflow = pickCashflow(p, params.showAfterTax, params.showInflationAdjusted)
               const cumulative = pickCumulative(p, params.showAfterTax, params.showInflationAdjusted)
 
               return (
-                <tr key={p.year} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                  <td className={`px-4 py-2.5 font-medium text-gray-900 sticky left-0 z-10 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>{p.year}</td>
+                <tr key={p.year} className={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f7]'}>
+                  <td className={`px-4 py-2.5 font-medium text-gray-900 sticky left-0 z-10 ${i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f7]'}`}>
+                    {p.year}
+                  </td>
                   <td className="px-4 py-2.5 text-right text-gray-700">
                     {formatCZK(p.effectiveRent)}
                   </td>
@@ -54,21 +57,13 @@ export function YearlyTable() {
                   <td className="px-4 py-2.5 text-right text-gray-400">
                     {formatCZK(p.interest)}
                   </td>
-                  <td
-                    className={`px-4 py-2.5 text-right font-medium ${
-                      cashflow >= 0 ? 'text-green-600' : 'text-red-500'
-                    }`}
-                  >
+                  <td className={`px-4 py-2.5 text-right font-medium ${cashflow >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                     {formatCZK(cashflow)}
                   </td>
-                  <td
-                    className={`px-4 py-2.5 text-right ${
-                      cumulative >= 0 ? 'text-green-600' : 'text-red-400'
-                    }`}
-                  >
+                  <td className={`px-4 py-2.5 text-right ${cumulative >= 0 ? 'text-green-600' : 'text-red-400'}`}>
                     {formatCZK(cumulative)}
                   </td>
-                  <td className="px-4 py-2.5 text-right font-medium text-blue-700">
+                  <td className="px-4 py-2.5 text-right font-medium text-[#8B6B1A]">
                     {formatCZK(p.equity)}
                   </td>
                   <td className="px-4 py-2.5 text-right text-gray-700">
