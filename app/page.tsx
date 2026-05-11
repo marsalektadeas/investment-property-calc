@@ -81,17 +81,24 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f9f7f4]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
+      <header className="bg-[#111111] sticky top-0 z-10">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          {/* Row 1: title + save button */}
+          {/* Logo + title */}
           <div className="flex items-center justify-between gap-3 min-w-0">
-            <div className="min-w-0">
-              <h1 className="text-base font-semibold text-gray-900 truncate">
-                Kalkulačka investiční nemovitosti
-              </h1>
-              <p className="text-xs text-gray-400">Realistický výpočet výnosnosti</p>
+            <div className="flex items-center gap-3 min-w-0">
+              {/* Logo mark */}
+              <div className="w-8 h-8 rounded-full border border-[#C9A84C] flex items-center justify-center flex-shrink-0">
+                <span className="text-[#C9A84C] text-sm font-bold leading-none">A</span>
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-white text-sm font-bold tracking-widest uppercase">Anomia</span>
+                  <span className="text-[#C9A84C] text-[10px] uppercase tracking-wider hidden sm:inline">Real Estate</span>
+                </div>
+                <p className="text-xs text-gray-500 truncate">Kalkulačka investiční nemovitosti</p>
+              </div>
             </div>
             {propertyId && (
               <button
@@ -99,29 +106,31 @@ export default function Home() {
                 disabled={saving || saved}
                 className={`shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
                   saved
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-900 text-white hover:bg-gray-700'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-[#C9A84C] text-[#111111] hover:bg-[#b8963e]'
                 }`}
               >
                 {saved ? '✓ Uloženo' : saving ? 'Ukládám...' : 'Uložit do BuyFlat'}
               </button>
             )}
           </div>
-          {/* Row 2: toggles + reset */}
+          {/* Toggles + reset */}
           <div className="flex items-center gap-3 sm:gap-5 shrink-0">
             <Toggle
               label="Po inflaci"
               checked={params.showInflationAdjusted}
               onChange={setShowInflationAdjusted}
+              className="text-gray-400 hover:text-white"
             />
             <Toggle
               label="Po daních"
               checked={params.showAfterTax}
               onChange={setShowAfterTax}
+              className="text-gray-400 hover:text-white"
             />
             <button
               onClick={resetToDefaults}
-              className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
+              className="text-xs text-gray-600 hover:text-gray-300 underline underline-offset-2 transition-colors"
             >
               Reset
             </button>
@@ -129,7 +138,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main layout: inputs left, results right */}
+      {/* Main layout */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col lg:flex-row gap-6 items-start">
         {/* Left column — inputs */}
         <div className="w-full lg:w-[380px] lg:flex-shrink-0 space-y-3">

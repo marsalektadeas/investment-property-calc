@@ -22,7 +22,7 @@ export function MetricCard({ label, value, sub, positive, large, tooltip }: Metr
         : 'text-red-500'
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+    <div className="bg-white border border-[#ede9e2] rounded-xl p-4 shadow-sm">
       <div className="flex items-center gap-1 mb-1">
         <p className="text-xs text-gray-400 uppercase tracking-wide">{label}</p>
         {tooltip && (
@@ -30,7 +30,7 @@ export function MetricCard({ label, value, sub, positive, large, tooltip }: Metr
             <button
               onMouseEnter={() => setShow(true)}
               onMouseLeave={() => setShow(false)}
-              className="text-gray-300 hover:text-gray-400 transition-colors"
+              className="text-gray-300 hover:text-[#C9A84C] transition-colors"
               aria-label="Vysvětlivka"
             >
               <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
@@ -38,9 +38,9 @@ export function MetricCard({ label, value, sub, positive, large, tooltip }: Metr
               </svg>
             </button>
             {show && (
-              <div className="absolute right-0 bottom-5 z-20 w-56 bg-gray-900 text-white text-xs rounded-lg p-3 leading-relaxed shadow-lg">
+              <div className="absolute right-0 bottom-5 z-20 w-56 bg-[#111111] text-white text-xs rounded-lg p-3 leading-relaxed shadow-lg">
                 {tooltip}
-                <div className="absolute right-1 bottom-[-5px] w-2.5 h-2.5 bg-gray-900 rotate-45" />
+                <div className="absolute right-1 bottom-[-5px] w-2.5 h-2.5 bg-[#111111] rotate-45" />
               </div>
             )}
           </div>

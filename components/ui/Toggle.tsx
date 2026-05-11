@@ -4,18 +4,19 @@ interface ToggleProps {
   label: string
   checked: boolean
   onChange: (v: boolean) => void
+  className?: string
 }
 
-export function Toggle({ label, checked, onChange }: ToggleProps) {
+export function Toggle({ label, checked, onChange, className }: ToggleProps) {
   return (
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+      className={`flex items-center gap-2 text-sm ${className ?? 'text-gray-600 hover:text-gray-900'}`}
     >
       <div
         className={`relative w-9 h-5 rounded-full transition-colors ${
-          checked ? 'bg-blue-600' : 'bg-gray-200'
+          checked ? 'bg-[#C9A84C]' : 'bg-gray-200'
         }`}
       >
         <div

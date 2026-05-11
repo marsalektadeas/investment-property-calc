@@ -12,7 +12,7 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
         : 'text-gray-900'
 
   return (
-    <div className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0">
+    <div className="flex justify-between items-center py-2 border-b border-[#f5f2ed] last:border-0">
       <span className="text-sm text-gray-500">{label}</span>
       <span className={`text-sm ${valueClass}`}>{value}</span>
     </div>
@@ -24,8 +24,9 @@ export function ExitSummary() {
   const { exit, alternative } = result
 
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm">
-      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-4">
+    <div className="bg-white border border-[#ede9e2] rounded-xl p-5 shadow-sm">
+      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+        <span className="w-0.5 h-3.5 bg-[#C9A84C] rounded-full flex-shrink-0" />
         Výpočet při prodeji — rok {params.exit.holdingYears}
       </h3>
 
@@ -39,7 +40,7 @@ export function ExitSummary() {
         <Row label="Čistý zisk z prodeje" value={formatCZK(exit.netSaleProfit)} highlight="neutral" />
         <Row label="Kumulovaný cashflow" value={`+ ${formatCZK(exit.totalCashflow)}`} highlight={exit.totalCashflow >= 0 ? 'positive' : 'negative'} />
 
-        <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+        <div className="mt-3 pt-3 border-t border-[#ede9e2] space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-gray-700">Čistý zisk (nad vloženou investicí)</span>
             <span className={`text-lg font-bold ${exit.totalReturn >= 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -47,13 +48,13 @@ export function ExitSummary() {
             </span>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-2">
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
+            <div className="bg-[#f9f7f4] rounded-lg p-3 text-center">
               <p className="text-xs text-gray-400 mb-1">ROI celkové</p>
               <p className={`text-lg font-bold ${exit.totalROI >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {formatPercent(exit.totalROI, 0)}
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-3 text-center">
+            <div className="bg-[#f9f7f4] rounded-lg p-3 text-center">
               <p className="text-xs text-gray-400 mb-1">Anualizované ROI</p>
               <p className={`text-lg font-bold ${exit.annualizedROI >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                 {formatPercent(exit.annualizedROI, 1)}
@@ -63,21 +64,21 @@ export function ExitSummary() {
         </div>
 
         {/* Srovnání s alternativní investicí */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-[#ede9e2]">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
             Srovnání s alternativou ({params.exit.alternativeReturnRate} % p.a.)
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-50 rounded-lg p-3">
+            <div className="bg-[#f5edda] rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">Nemovitost — na účtu</p>
-              <p className="text-base font-bold text-blue-700">
+              <p className="text-base font-bold text-[#8B6B1A]">
                 {formatCZK(exit.netSaleProfit + exit.totalCashflow)}
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
                 výtěžek z prodeje + cashflow
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="bg-[#f9f7f4] rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">Alternativa — na účtu</p>
               <p className="text-base font-bold text-gray-700">
                 {formatCZK(alternative.finalPortfolio)}

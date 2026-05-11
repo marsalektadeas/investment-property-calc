@@ -8,7 +8,7 @@ const SCENARIOS: ScenarioType[] = ['conservative', 'realistic', 'optimistic']
 
 const SCENARIO_ACTIVE: Record<ScenarioType, string> = {
   conservative: 'bg-orange-500 text-white border-orange-500',
-  realistic: 'bg-blue-600 text-white border-blue-600',
+  realistic: 'bg-[#C9A84C] text-[#111111] border-[#C9A84C]',
   optimistic: 'bg-green-600 text-white border-green-600',
 }
 
@@ -30,11 +30,11 @@ export function ScenarioSelector() {
           className={`flex-1 py-2 px-3 rounded-xl border transition-all text-left ${
             params.scenario === s
               ? SCENARIO_ACTIVE[s]
-              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+              : 'bg-white text-gray-600 border-[#ede9e2] hover:border-[#C9A84C]'
           }`}
         >
           <div className="text-sm font-medium">{SCENARIO_LABELS[s]}</div>
-          <div className={`text-xs mt-0.5 leading-tight ${params.scenario === s ? 'opacity-80' : 'text-gray-400'}`}>
+          <div className={`text-xs mt-0.5 leading-tight ${params.scenario === s ? 'opacity-70' : 'text-gray-400'}`}>
             {SCENARIO_HINTS[s]}
           </div>
         </button>
