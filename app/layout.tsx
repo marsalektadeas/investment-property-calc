@@ -5,14 +5,14 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Kalkulačka investiční nemovitosti',
-  description: 'Výpočet výnosnosti investice do nemovitosti — cashflow, ROI, equity, exit',
+  title: 'RentScope — Investiční kalkulačka nemovitostí',
+  description: 'Spočítejte výnosnost investice do nemovitosti — cashflow, ROI, equity a srovnání s alternativní investicí.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="cs">
-      <body className={`${inter.className} bg-[#f9f7f4] text-gray-900 antialiased`}>
+      <body className={`${inter.className} bg-[#F8FAFC] text-gray-900 antialiased`}>
         {children}
       </body>
     </html>

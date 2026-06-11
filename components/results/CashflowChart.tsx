@@ -30,15 +30,15 @@ export function CashflowChart() {
   const cumulativeLabel = `Kumulativní (${taxLabel}${realLabel})`
 
   return (
-    <div className="bg-white border border-[#ede9e2] rounded-xl p-5 shadow-sm">
+    <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-          <span className="w-0.5 h-3.5 bg-[#C9A84C] rounded-full flex-shrink-0" />
+          <span className="w-0.5 h-3.5 bg-[#2563EB] rounded-full flex-shrink-0" />
           Cashflow v čase
         </h3>
         <div className="flex gap-1.5">
           {real && (
-            <span className="text-xs text-[#8B6B1A] bg-[#f5edda] px-2 py-0.5 rounded-full">
+            <span className="text-xs text-[#1E40AF] bg-[#EFF6FF] px-2 py-0.5 rounded-full">
               po inflaci
             </span>
           )}
@@ -54,15 +54,15 @@ export function CashflowChart() {
           <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorCashflow" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#C9A84C" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="#C9A84C" stopOpacity={0} />
+                <stop offset="5%" stopColor="#2563EB" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#2563EB" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="colorCumulative" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#16a34a" stopOpacity={0.15} />
                 <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0ece4" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
             <XAxis dataKey="year" tick={{ fontSize: 11 }} />
             <YAxis tickFormatter={formatCZKShort} tick={{ fontSize: 11 }} width={70} />
             <Tooltip
@@ -75,7 +75,7 @@ export function CashflowChart() {
             <Area
               type="monotone"
               dataKey="cashflow"
-              stroke="#C9A84C"
+              stroke="#2563EB"
               strokeWidth={2}
               fill="url(#colorCashflow)"
             />
@@ -91,7 +91,7 @@ export function CashflowChart() {
       </div>
       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block w-3 h-0.5 bg-[#C9A84C] rounded" />
+          <span className="inline-block w-3 h-0.5 bg-[#2563EB] rounded" />
           {cashflowLabel}
         </span>
         <span className="flex items-center gap-1.5">

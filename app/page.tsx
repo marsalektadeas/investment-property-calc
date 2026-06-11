@@ -103,23 +103,20 @@ export default function Home() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#f9f7f4]">
+    <div className="min-h-screen bg-[#F8FAFC]">
 
       {/* ── Print-only header ─────────────────────────────────────────────────── */}
       <div className="hidden print:block px-0 pt-0">
-        {/* Gold top bar */}
-        <div className="h-[4px] bg-[#C9A84C] mb-5" />
+        {/* Accent top bar */}
+        <div className="h-[4px] bg-[#2563EB] mb-5" />
         <div className="flex items-start justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border-2 border-[#111111] flex items-center justify-center flex-shrink-0">
-              <span className="text-[#111111] font-bold text-base leading-none">A</span>
-            </div>
             <div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-[#111111] font-bold text-lg tracking-widest uppercase">Anomia</span>
-                <span className="text-gray-400 text-xs uppercase tracking-wider">Real Estate</span>
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-[#0F172A] font-bold text-xl tracking-tight">Rent</span>
+                <span className="text-[#2563EB] font-bold text-xl tracking-tight">Scope</span>
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">Kalkulačka investiční nemovitosti</p>
+              <p className="text-xs text-gray-500 mt-0.5">Investiční kalkulačka nemovitostí</p>
             </div>
           </div>
           <div className="text-right text-xs text-gray-500 space-y-0.5">
@@ -132,31 +129,28 @@ export default function Home() {
         {/* Parameters summary grid */}
         <div className="grid grid-cols-4 gap-2 mb-6">
           {printParams.map(([label, value]) => (
-            <div key={label} className="bg-[#f9f7f4] border border-[#ede9e2] rounded-lg px-3 py-2">
+            <div key={label} className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg px-3 py-2">
               <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
               <p className="font-semibold text-gray-800 text-xs">{value}</p>
             </div>
           ))}
         </div>
 
-        <div className="border-t border-[#ede9e2] mb-5" />
+        <div className="border-t border-[#E2E8F0] mb-5" />
       </div>
 
       {/* ── Screen header ─────────────────────────────────────────────────────── */}
-      <header className="bg-[#111111] sticky top-0 z-10 print:hidden">
+      <header className="bg-[#0F172A] sticky top-0 z-10 print:hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           {/* Logo + title */}
           <div className="flex items-center justify-between gap-3 min-w-0">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-8 h-8 rounded-full border border-[#C9A84C] flex items-center justify-center flex-shrink-0">
-                <span className="text-[#C9A84C] text-sm font-bold leading-none">A</span>
-              </div>
               <div className="min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-white text-sm font-bold tracking-widest uppercase">Anomia</span>
-                  <span className="text-[#C9A84C] text-[10px] uppercase tracking-wider hidden sm:inline">Real Estate</span>
+                <div className="flex items-baseline gap-0.5">
+                  <span className="text-white text-base font-bold tracking-tight">Rent</span>
+                  <span className="text-[#60A5FA] text-base font-bold tracking-tight">Scope</span>
                 </div>
-                <p className="text-xs text-gray-500 truncate">Kalkulačka investiční nemovitosti</p>
+                <p className="text-xs text-gray-400 truncate -mt-0.5">Investiční kalkulačka nemovitostí</p>
               </div>
             </div>
             {propertyId && (
@@ -166,7 +160,7 @@ export default function Home() {
                 className={`shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
                   saved
                     ? 'bg-green-600 text-white'
-                    : 'bg-[#C9A84C] text-[#111111] hover:bg-[#b8963e]'
+                    : 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'
                 }`}
               >
                 {saved ? '✓ Uloženo' : saving ? 'Ukládám...' : 'Uložit do BuyFlat'}
@@ -189,7 +183,7 @@ export default function Home() {
             />
             <button
               onClick={() => window.print()}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-600 text-gray-400 hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors"
+              className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-600 text-gray-400 hover:border-[#2563EB] hover:text-[#2563EB] transition-colors"
             >
               PDF
             </button>

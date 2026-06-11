@@ -63,14 +63,13 @@ function calculate(params: InputParams): CalculationResult {
   const metrics = calcMetrics(adjustedParams, mortgage, monthly, projections)
   const exit = calcExit(adjustedParams, projections, initialInvestment)
 
-  const alternativeRaw = calcAlternative(
+  const alternative = calcAlternative(
     initialInvestment,
     projections,
+    exit.netSaleProfit,
     adjustedParams.exit.alternativeReturnRate,
     adjustedParams.exit.holdingYears,
   )
-  const propertyFinalWealth = exit.netSaleProfit + exit.totalCashflow
-  const alternative = { ...alternativeRaw, advantage: propertyFinalWealth - alternativeRaw.finalPortfolio }
 
   return { mortgage, monthly, metrics, projections, exit, alternative }
 }

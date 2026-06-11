@@ -1,30 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --gold: #C9A84C;
-  --gold-hover: #b8963e;
-  --gold-light: #f5edda;
-  --anomia-dark: #111111;
-  --anomia-dark-2: #1a1a1a;
-  --warm-bg: #f9f7f4;
-  --warm-border: #ede9e2;
-  --background: var(--warm-bg);
-  --foreground: #1a1a1a;
+  /* Brand — deep navy + electric blue accent */
+  --brand: #1E3A8A;          /* deep navy — wordmark, print bar */
+  --accent: #2563EB;         /* interactive blue — slidery, CTA, akcenty */
+  --accent-hover: #1D4ED8;
+  --accent-light: #EFF6FF;   /* světlé pozadí badge */
+  --accent-text: #1E40AF;    /* tmavě modrý text na světlém */
+  --ink: #0F172A;            /* tmavé plochy — header, tooltipy */
+  --surface: #F8FAFC;        /* pozadí stránky */
+  --border: #E2E8F0;
+  --background: var(--surface);
+  --foreground: var(--ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-gold: var(--gold);
-  --color-gold-hover: var(--gold-hover);
-  --color-gold-light: var(--gold-light);
-  --color-anomia-dark: var(--anomia-dark);
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-ink: var(--ink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--warm-bg);
+  background: var(--surface);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

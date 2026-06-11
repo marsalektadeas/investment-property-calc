@@ -78,10 +78,10 @@ export function SliderInput({
             className="w-full h-1.5 appearance-none bg-gray-200 rounded-full cursor-pointer
               [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4
               [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-[#C9A84C] [&::-webkit-slider-thumb]:cursor-pointer
+              [&::-webkit-slider-thumb]:bg-[#2563EB] [&::-webkit-slider-thumb]:cursor-pointer
               [&::-webkit-slider-thumb]:shadow-sm"
             style={{
-              background: `linear-gradient(to right, #C9A84C ${pct}%, #e5e7eb ${pct}%)`,
+              background: `linear-gradient(to right, #2563EB ${pct}%, #e5e7eb ${pct}%)`,
             }}
           />
         </div>
@@ -97,8 +97,8 @@ export function SliderInput({
             onFocus={handleFocus}
             onBlur={handleBlur}
             onChange={handleInputChange}
-            className="w-24 text-right text-sm font-medium text-gray-900 bg-[#f9f7f4] border border-[#ede9e2]
-              rounded px-2 py-1 focus:outline-none focus:border-[#C9A84C] focus:bg-white transition-colors"
+            className="w-24 text-right text-sm font-medium text-gray-900 bg-[#F8FAFC] border border-[#E2E8F0]
+              rounded px-2 py-1 focus:outline-none focus:border-[#2563EB] focus:bg-white transition-colors"
           />
           {unit && unitPosition === 'suffix' && (
             <span className="text-sm text-gray-400">{unit}</span>

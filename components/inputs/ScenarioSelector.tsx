@@ -8,7 +8,7 @@ const SCENARIOS: ScenarioType[] = ['conservative', 'realistic', 'optimistic']
 
 const SCENARIO_ACTIVE: Record<ScenarioType, string> = {
   conservative: 'bg-orange-500 text-white border-orange-500',
-  realistic: 'bg-[#C9A84C] text-[#111111] border-[#C9A84C]',
+  realistic: 'bg-[#2563EB] text-white border-[#2563EB]',
   optimistic: 'bg-green-600 text-white border-green-600',
 }
 
@@ -30,7 +30,7 @@ export function ScenarioSelector() {
           className={`flex-1 py-2 px-3 rounded-xl border transition-all text-left ${
             params.scenario === s
               ? SCENARIO_ACTIVE[s]
-              : 'bg-white text-gray-600 border-[#ede9e2] hover:border-[#C9A84C]'
+              : 'bg-white text-gray-600 border-[#E2E8F0] hover:border-[#2563EB]'
           }`}
         >
           <div className="text-sm font-medium">{SCENARIO_LABELS[s]}</div>

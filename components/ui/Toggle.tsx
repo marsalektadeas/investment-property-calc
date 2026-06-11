@@ -16,7 +16,7 @@ export function Toggle({ label, checked, onChange, className }: ToggleProps) {
     >
       <div
         className={`relative w-9 h-5 rounded-full transition-colors ${
-          checked ? 'bg-[#C9A84C]' : 'bg-gray-200'
+          checked ? 'bg-[#2563EB]' : 'bg-gray-200'
         }`}
       >
         <div

@@ -142,8 +142,9 @@ export interface ExitResult {
 }
 
 export interface AlternativeResult {
-  finalPortfolio: number        // hodnota portfolia na konci
-  totalReturn: number           // zisk oproti počáteční investici
+  finalPortfolio: number        // hodnota alternativního portfolia na konci
+  propertyFinalWealth: number   // bohatství z nemovitosti na konci (na stejném základě)
+  totalReturn: number           // zisk alternativy oproti počáteční investici
   totalROI: number              // % z počáteční investice
   annualizedROI: number         // % ročně (CAGR)
   advantage: number             // nemovitost − alternativa (kladné = nem. vyhrává)
