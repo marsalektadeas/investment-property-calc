@@ -141,7 +141,7 @@ export default function Home() {
       </div>
 
       {/* ── Screen header ─────────────────────────────────────────────────────── */}
-      <header className="bg-[#0F172A] sticky top-0 z-10 print:hidden">
+      <header className="bg-[#0F172A] sticky top-0 z-40 print:hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           {/* Logo + title */}
           <div className="flex items-center justify-between gap-3 min-w-0">
