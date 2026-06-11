@@ -53,3 +53,14 @@ Přidáno pole `propertyFinalWealth` do `AlternativeResult`.
   akcie" / „pozor, záporný cashflow") — snižuje tření, zvyšuje aha-moment.
 - **Vlastní doména** místo `realapp-gamma.vercel.app`.
 - **Vizuální QA**: projet LP na mobilu + PDF print kalkulačky v nové paletě.
+
+## Známá úskalí
+
+### Z-index / sticky layering (vyřešeno 2026-06-11)
+Hlavička kalkulačky je `sticky top-0` a `YearlyTable` má přilepený levý sloupec
+(`sticky left-0`). Oba měly `z-10` → při shodě z-indexu vyhrává pozdější prvek
+v DOM, takže buňky se sloupcem *Rok* se při scrollu propisovaly přes hlavičku.
+
+**Pravidlo:** hlavička musí mít vyšší z-index než přilepené buňky tabulky.
+Aktuální vrstvení: hlavička `z-40` > tooltip metriky `z-20` > sticky buňky
+tabulky `z-10`. Při přidávání dalších sticky/overlay prvků tohle pořadí držet.
