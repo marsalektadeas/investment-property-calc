@@ -25,7 +25,7 @@
 | Lead capture | Jen CTA do toolu (MVP) | Nejjednodušší; e-mail gate doplníme později |
 | Social proof | Vynecháno | Bez reálných dat nevymýšlet fake recenze (etický/právní risk) |
 | Výpočet — alternativa | Opraveno: srovnání na jednom terminálním základě | Viz níže |
-| Exit UX — vysvětlení | Přidány tooltips + rozbalovací výklad „proč se čísla liší" | Uživatelé pletli „čistý zisk z prodeje" (hotovost v den prodeje) s „nemovitostí na účtu" (terminální bohatství s časem peněz) |
+| Exit — srovnání s ETF | Přeformulováno na reálné terminální zůstatky „na účtu" (viz níže) | Opportunity-cost salda byla správná pro rozdíl, ale jako absolutní čísla matoucí — nešlo z nich vyčíst „kolik budu mít na účtu" |
 
 ## Oprava výpočtu #1 (hotovo)
 
@@ -35,32 +35,41 @@ Sjednoceno (`lib/alternative.ts`): alternativa = počáteční kapitál složen�
 úročený; nemovitost = výtěžek z prodeje + cashflow reinvestovaný stejnou sazbou.
 Přidáno pole `propertyFinalWealth` do `AlternativeResult`.
 
-## Exit UX — vysvětlení metrik (hotovo 2026-07-06)
+## Exit — srovnání „koupím vs. ETF" jako zůstatky na účtu (hotovo 2026-07-06)
 
-Uživatel nechápal rozdíl mezi dvěma čísly v `ExitSummary` a chtěl ho vysvětlit
-přímo v aplikaci. Rozdíl **není bug** — ověřeno výpočtem proti reálným číslům:
+Uživatel chtěl jednu věc: **kolik reálně budu mít na účtu**, když nemovitost
+koupím a prodám, vs. když peníze dám do ETF. Dosavadní dlaždice „na účtu"
+zobrazovaly opportunity-cost salda — jejich **rozdíl byl správný**, ale absolutní
+čísla nebyla skutečné zůstatky (nemovitost očištěná o oportunitní náklad
+doplácení, alternativa jen počáteční kapitál bez reinvestice ušetřených doplatků).
+Matoucí.
 
-- **Čistý zisk z prodeje** (`exit.netSaleProfit`) = hotovost v ruce v den prodeje
-  (cena − hypotéka − náklady − daň). Ignoruje průběžné doplácení.
-- **Nemovitost — na účtu** (`alternative.propertyFinalWealth`) = výtěžek z prodeje
-  + každý roční cashflow reinvestovaný alternativní sazbou (čas peněz). Při
-  záporném cashflow tato část bohatství **snižuje** → bývá nižší než čistý zisk
-  z prodeje. Právě tohle číslo je férově srovnatelné s alternativou.
+**Nová metodika (`lib/alternative.ts`)** — obě strany dostanou stejnou hotovost
+ve stejný čas a počítají se jako reálné terminální zůstatky:
 
-Rozdíl obou = budoucí hodnota všeho, co majitel do nemovitosti během držení
-doplatil (úročeno oportunitní sazbou).
+- **Koupím nemovitost** (`propertyFinalWealth`) = čistý výtěžek z prodeje +
+  přebytkový (kladný) cashflow reinvestovaný alt. sazbou. Doplatky jsou utopené
+  v nemovitosti → vrací se v prodejní ceně.
+- **Dám do ETF** (`finalPortfolio`) = počáteční kapitál složeně úročený + každý
+  doplatek (záporný cashflow), který by jinak šel do hypotéky, investovaný do ETF.
 
-**Poznámka k metodice:** zelený „Čistý zisk (nad vloženou investicí)"
-(`exit.totalReturn`) používá **nominální** cashflow, kdežto „na účtu" ho **úročí**.
-Není to nekonzistence — jsou to dvě různé otázky (celkový nominální zisk vs.
-terminální bohatství pro férové srovnání). Nový výklad to uživateli pojmenovává.
+`advantage = propertyFinalWealth − finalPortfolio` je **matematicky totožný** se
+starým opportunity-cost modelem → landing a ostatní výpočty beze změny. Ověřeno:
+na příkladu rok 20 dává starý model 3,04M vs 3,58M (rozdíl −538 874), nový 7,76M
+vs 8,30M (rozdíl −538 873, jen zaokrouhlení). Stejný závěr, reálná čísla.
 
 Implementace:
+- `lib/alternative.ts` přepsán (terminální zůstatky, `Math.max(0, ±cashflow)`).
 - Nová komponenta `components/ui/InfoTooltip.tsx` (hover/tap, align left/right).
-- Tooltips u 4 řádků v `ExitSummary` + rozbalovací `<details>` box s dynamicky
-  dopočítaným rozdílem (funguje pro kladný i záporný cashflow).
+- `ExitSummary`: dlaždice „Koupím nemovitost" / „Dám do ETF" + podnadpis „Kolik
+  budeš mít na účtu", tooltips, přepsaný `<details>` výklad. Info-tooltips i u
+  řádků „Čistý zisk z prodeje" a „Kumulovaný cashflow".
 - Opraveno zobrazení: „Kumulovaný cashflow" ukazoval `+ -1 609 164` → nyní
   znaménkově korektní `− 1 609 164` (helper `signedCZK`).
+
+**Pozn.:** zelený „Čistý zisk (nad vloženou investicí)" (`exit.totalReturn`) je
+stále nominální zisk nad vloženou investicí — pro rozhodnutí koupit vs. ETF slouží
+srovnání zůstatků, ne tento řádek (výklad na to upozorňuje).
 
 ## Otevřené TODO (doladíme příště)
 

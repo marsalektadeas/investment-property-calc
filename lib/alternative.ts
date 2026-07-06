@@ -1,23 +1,29 @@
 import type { AlternativeResult, YearlyProjection } from '@/types'
 
 /**
- * Fér srovnání nemovitosti s alternativní investicí (opportunity cost).
+ * Fér srovnání „koupím nemovitost" vs. „dám peníze do ETF" na jednom
+ * intuitivním základě: kolik reálně skončí na účtu v každém scénáři, když do
+ * obou nasypeš úplně stejnou hotovost ve stejných okamžicích.
  *
- * Obě varianty startují se stejným počátečním kapitálem (initialInvestment)
- * a průběžné peníze se v obou úročí stejnou alternativní sazbou — porovnáváme
- * tedy terminální bohatství na jednom společném základě.
+ * Společný cash schéma:
+ *   - t0: obě varianty startují stejným počátečním kapitálem (initialInvestment).
+ *   - každý rok: nemovitost buď žádá doplatek (záporný cashflow), nebo vyplácí
+ *     přebytek (kladný cashflow).
  *
- * - Alternativa (nekoupíš): počáteční kapitál se složeně úročí alternativní
- *   sazbou po celou dobu držení.
- * - Nemovitost (koupíš): na konci dostaneš čistý výtěžek z prodeje
- *   (netSaleProfit) + průběžný čistý cashflow reinvestovaný stejnou
- *   alternativní sazbou až do horizontu. Záporný cashflow (doplácíš)
- *   bohatství snižuje, kladný zvyšuje.
+ * Nemovitost — na účtu:
+ *   čistý výtěžek z prodeje (netSaleProfit) + přebytkový nájem (kladný cashflow)
+ *   reinvestovaný alternativní sazbou až do horizontu. Doplatky jsou utopené
+ *   v nemovitosti (dostaneš je zpět v ceně při prodeji).
  *
- * Pozn.: Dřívější verze odečítala cashflow z alternativy a zároveň ho
- * přičítala k nemovitosti, což ho u kladného cashflow počítalo dvakrát ve
- * prospěch nemovitosti. Navíc property CAGR a alternativa používaly jinou
- * metodu. Tahle verze obojí sjednocuje.
+ * Alternativa (ETF) — na účtu:
+ *   počáteční kapitál složeně úročený + KAŽDÝ doplatek, který bys jinak poslal
+ *   do hypotéky, místo toho investovaný stejnou sazbou. Tím oba scénáře
+ *   spotřebují stejnou hotovost a jsou přímo srovnatelné jako zůstatky na účtu.
+ *
+ * Rozdíl (advantage) je matematicky totožný s klasickým opportunity-cost
+ * modelem (netSaleProfit + FV(všech cashflow) − FV(počátečního kapitálu)),
+ * jen jsou obě strany prezentované jako reálné terminální zůstatky, ne jako
+ * salda očištěná o oportunitní náklad.
  */
 export function calcAlternative(
   initialInvestment: number,
@@ -28,20 +34,33 @@ export function calcAlternative(
 ): AlternativeResult {
   const rate = returnRate / 100
 
-  // Alternativa: počáteční kapitál složeně úročený alternativní sazbou
-  const finalPortfolio = initialInvestment * Math.pow(1 + rate, holdingYears)
+  // Budoucí hodnota částky vložené na konci roku Y → roste (holdingYears − Y) let.
+  const fvAtRate = (amount: number, yearIndex: number) =>
+    amount * Math.pow(1 + rate, Math.max(0, holdingYears - (yearIndex + 1)))
 
-  // Nemovitost: výtěžek z prodeje + cashflow reinvestovaný alt. sazbou.
-  // Cashflow roku Y přijde na konci roku Y → zhodnocuje se (holdingYears − Y) let.
-  const cashflowFutureValue = projections.reduce((sum, p, i) => {
-    const yearsRemaining = Math.max(0, holdingYears - (i + 1))
-    return sum + p.netCashflow * Math.pow(1 + rate, yearsRemaining)
-  }, 0)
-  const propertyFinalWealth = netSaleProfit + cashflowFutureValue
+  // Nemovitost: výtěžek z prodeje + reinvestovaný přebytkový (kladný) cashflow.
+  const reinvestedSurplus = projections.reduce(
+    (sum, p, i) => sum + fvAtRate(Math.max(0, p.netCashflow), i),
+    0,
+  )
+  const propertyFinalWealth = netSaleProfit + reinvestedSurplus
 
-  const totalReturn = finalPortfolio - initialInvestment
-  const totalROI = initialInvestment > 0 ? (totalReturn / initialInvestment) * 100 : 0
-  // CAGR čistého složeného úročení je přesně alternativní sazba
+  // ETF: počáteční kapitál + doplatky (záporný cashflow) investované do ETF.
+  const baseGrowth = initialInvestment * Math.pow(1 + rate, holdingYears)
+  const topUpsInvested = projections.reduce(
+    (sum, p, i) => sum + fvAtRate(Math.max(0, -p.netCashflow), i),
+    0,
+  )
+  const finalPortfolio = baseGrowth + topUpsInvested
+
+  // Kolik jsi do ETF celkem vložil (nominálně) — pro výnos alternativy.
+  const totalContributed =
+    initialInvestment +
+    projections.reduce((sum, p) => sum + Math.max(0, -p.netCashflow), 0)
+
+  const totalReturn = finalPortfolio - totalContributed
+  const totalROI = totalContributed > 0 ? (totalReturn / totalContributed) * 100 : 0
+  // Každá koruna v ETF roste alternativní sazbou → CAGR = sazba.
   const annualizedROI = holdingYears > 0 ? returnRate : 0
   const advantage = propertyFinalWealth - finalPortfolio
 

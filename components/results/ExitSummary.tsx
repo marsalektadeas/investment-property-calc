@@ -94,44 +94,47 @@ export function ExitSummary() {
 
         {/* Srovnání s alternativní investicí */}
         <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-            Srovnání s alternativou ({params.exit.alternativeReturnRate} % p.a.)
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            Kolik budeš mít na účtu ({params.exit.alternativeReturnRate} % p.a.)
+          </p>
+          <p className="text-xs text-gray-400 mb-3">
+            Stejná hotovost do obou scénářů — zůstatek na konci roku {params.exit.holdingYears}.
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-[#EFF6FF] rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
-                Nemovitost — na účtu
+                Koupím nemovitost
                 <InfoTooltip
                   align="left"
-                  text="Kolik reálně máš na konci na účtu, když počítáš čas peněz. Výtěžek z prodeje + každý roční cashflow reinvestovaný alternativní sazbou. Když jsi průběžně doplácel (záporný cashflow), tyto vklady tu částku snižují — proto bývá nižší než čistý zisk z prodeje."
+                  text="Kolik reálně skončí na tvém účtu, když nemovitost koupíš a na konci prodáš. Čistý výtěžek z prodeje + přebytkový nájem (kladný cashflow) reinvestovaný alternativní sazbou. Doplatky do hypotéky dostáváš zpět v prodejní ceně."
                 />
               </p>
               <p className="text-base font-bold text-[#1E40AF]">
                 {formatCZK(alternative.propertyFinalWealth)}
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
-                výtěžek z prodeje + reinvestovaný cashflow
+                výtěžek z prodeje + reinvestovaný přebytek
               </p>
             </div>
             <div className="bg-[#F8FAFC] rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
-                Alternativa — na účtu
+                Dám do ETF
                 <InfoTooltip
                   align="left"
-                  text="Kolik bys měl, kdybys nemovitost nekoupil a stejný počáteční kapitál nechal složeně úročit alternativní sazbou po celou dobu držení. Férová srovnávací základna (oportunitní náklad)."
+                  text="Kolik skončí na účtu, když nemovitost nekoupíš. Počáteční kapitál + KAŽDÁ koruna, kterou bys jinak doplácel do hypotéky, místo toho investovaná do ETF stejnou sazbou. Oba scénáře tak spotřebují úplně stejnou hotovost."
                 />
               </p>
               <p className="text-base font-bold text-gray-700">
                 {formatCZK(alternative.finalPortfolio)}
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
-                počáteční kapitál složeně úročený
+                kapitál + doplatky investované do ETF
               </p>
             </div>
           </div>
           <div className={`mt-3 rounded-lg p-3 text-center ${alternative.advantage >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
             <p className="text-xs text-gray-500 mb-1">
-              {alternative.advantage >= 0 ? 'Nemovitost vydělá navíc' : 'Alternativa vydělá navíc'}
+              {alternative.advantage >= 0 ? 'Nemovitostí získáš navíc' : 'V ETF získáš navíc'}
             </p>
             <p className={`text-lg font-bold ${alternative.advantage >= 0 ? 'text-green-600' : 'text-red-500'}`}>
               {formatCZK(Math.abs(alternative.advantage))}
@@ -149,28 +152,27 @@ export function ExitSummary() {
               >
                 <path d="M6 4l4 4-4 4V4z" />
               </svg>
-              Proč se „čistý zisk z prodeje" a „nemovitost na účtu" liší?
+              Jak se ta dvě čísla počítají?
             </summary>
             <div className="mt-2 text-xs text-gray-500 leading-relaxed space-y-2 pl-[18px]">
               <p>
-                <span className="font-semibold text-gray-700">Čistý zisk z prodeje</span> ({formatCZK(exit.netSaleProfit)}) je
-                jednorázová hotovost v den prodeje. Dívá se jen na tento okamžik — kolik ti zbyde,
-                když prodáš a splatíš hypotéku.
+                Obě varianty dostanou <span className="font-medium">úplně stejnou hotovost ve stejný čas</span>:
+                počáteční kapitál teď a případné doplatky do hypotéky každý rok. Jinak by srovnání nebylo férové.
               </p>
               <p>
-                <span className="font-semibold text-gray-700">Nemovitost — na účtu</span> ({formatCZK(alternative.propertyFinalWealth)})
-                je poctivý součet celého příběhu: k výtěžku z prodeje přičte i každou korunu cashflow,
-                ale s ohledem na <span className="font-medium">čas peněz</span> — jako by se dala uložit za{' '}
-                {params.exit.alternativeReturnRate} % p.a. Tvůj cashflow byl{' '}
-                {exit.totalCashflow >= 0 ? 'kladný' : 'záporný'}, takže tato část hodnotu{' '}
-                {exit.totalCashflow >= 0 ? 'zvyšuje' : 'snižuje'}.
+                <span className="font-semibold text-gray-700">Koupím nemovitost</span> ({formatCZK(alternative.propertyFinalWealth)}):
+                čistý výtěžek z prodeje ({formatCZK(exit.netSaleProfit)}) + přebytkový nájem reinvestovaný do ETF.
+                Doplatky, které jsi během let posílal do hypotéky, dostáváš zpět v prodejní ceně.
               </p>
               <p>
-                Rozdíl {formatCZK(Math.abs(exit.netSaleProfit - alternative.propertyFinalWealth))} je{' '}
-                {exit.totalCashflow >= 0
-                  ? 'zhodnocení průběžného kladného cashflow.'
-                  : 'budoucí hodnota všech peněz, které jsi musel do nemovitosti během držení doplatit (úročeno oportunitní sazbou).'}{' '}
-                Právě „nemovitost na účtu" se dá férově porovnat s alternativou vedle.
+                <span className="font-semibold text-gray-700">Dám do ETF</span> ({formatCZK(alternative.finalPortfolio)}):
+                počáteční kapitál + každý doplatek, který bys jinak poslal do hypotéky, necháš růst
+                v ETF za {params.exit.alternativeReturnRate} % p.a.
+              </p>
+              <p className="text-gray-400">
+                Pozn.: „Čistý zisk z prodeje" ({formatCZK(exit.netSaleProfit)}) výše je jen hotovost v den prodeje —
+                neřeší, kolik jsi do nemovitosti během let vložil. Pro rozhodnutí koupit vs. ETF se řiď tímhle
+                srovnáním zůstatků na účtu.
               </p>
             </div>
           </details>
