@@ -1,9 +1,25 @@
 'use client'
 
 import { useCalculatorStore } from '@/store/useCalculatorStore'
-import { formatCZK, formatPercent, formatYears } from '@/utils/format'
+import { formatCZK, formatPercent } from '@/utils/format'
+import { InfoTooltip } from '@/components/ui/InfoTooltip'
 
-function Row({ label, value, highlight }: { label: string; value: string; highlight?: 'positive' | 'negative' | 'neutral' }) {
+/** Znaménkově čitelný cashflow: „+ 120 000 Kč" / „− 120 000 Kč" */
+function signedCZK(value: number): string {
+  return `${value >= 0 ? '+ ' : '− '}${formatCZK(Math.abs(value))}`
+}
+
+function Row({
+  label,
+  value,
+  highlight,
+  tooltip,
+}: {
+  label: string
+  value: string
+  highlight?: 'positive' | 'negative' | 'neutral'
+  tooltip?: string
+}) {
   const valueClass =
     highlight === 'positive'
       ? 'text-green-600 font-semibold'
@@ -13,7 +29,10 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
 
   return (
     <div className="flex justify-between items-center py-2 border-b border-[#F1F5F9] last:border-0">
-      <span className="text-sm text-gray-500">{label}</span>
+      <span className="text-sm text-gray-500 flex items-center gap-1.5">
+        {label}
+        {tooltip && <InfoTooltip text={tooltip} align="left" />}
+      </span>
       <span className={`text-sm ${valueClass}`}>{value}</span>
     </div>
   )
@@ -37,8 +56,18 @@ export function ExitSummary() {
         {exit.capitalGainsTax > 0 && (
           <Row label="Daň z prodeje" value={`− ${formatCZK(exit.capitalGainsTax)}`} />
         )}
-        <Row label="Čistý zisk z prodeje" value={formatCZK(exit.netSaleProfit)} highlight="neutral" />
-        <Row label="Kumulovaný cashflow" value={`+ ${formatCZK(exit.totalCashflow)}`} highlight={exit.totalCashflow >= 0 ? 'positive' : 'negative'} />
+        <Row
+          label="Čistý zisk z prodeje"
+          value={formatCZK(exit.netSaleProfit)}
+          highlight="neutral"
+          tooltip="Hotovost, kterou dostaneš v ruce v den prodeje: prodejní cena − zůstatek hypotéky − náklady na prodej − daň. Neobsahuje peníze, které jsi do nemovitosti během držení průběžně vkládal."
+        />
+        <Row
+          label="Kumulovaný cashflow"
+          value={signedCZK(exit.totalCashflow)}
+          highlight={exit.totalCashflow >= 0 ? 'positive' : 'negative'}
+          tooltip="Součet ročních čistých cashflow (po daních) za celou dobu držení. Kladné = nájem pokryl splátku i náklady a ještě zbylo. Záporné = každý rok jsi musel doplácet z vlastní kapsy."
+        />
 
         <div className="mt-3 pt-3 border-t border-[#E2E8F0] space-y-2">
           <div className="flex justify-between items-center">
@@ -70,7 +99,13 @@ export function ExitSummary() {
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-[#EFF6FF] rounded-lg p-3">
-              <p className="text-xs text-gray-500 mb-1">Nemovitost — na účtu</p>
+              <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
+                Nemovitost — na účtu
+                <InfoTooltip
+                  align="left"
+                  text="Kolik reálně máš na konci na účtu, když počítáš čas peněz. Výtěžek z prodeje + každý roční cashflow reinvestovaný alternativní sazbou. Když jsi průběžně doplácel (záporný cashflow), tyto vklady tu částku snižují — proto bývá nižší než čistý zisk z prodeje."
+                />
+              </p>
               <p className="text-base font-bold text-[#1E40AF]">
                 {formatCZK(alternative.propertyFinalWealth)}
               </p>
@@ -79,7 +114,13 @@ export function ExitSummary() {
               </p>
             </div>
             <div className="bg-[#F8FAFC] rounded-lg p-3">
-              <p className="text-xs text-gray-500 mb-1">Alternativa — na účtu</p>
+              <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
+                Alternativa — na účtu
+                <InfoTooltip
+                  align="left"
+                  text="Kolik bys měl, kdybys nemovitost nekoupil a stejný počáteční kapitál nechal složeně úročit alternativní sazbou po celou dobu držení. Férová srovnávací základna (oportunitní náklad)."
+                />
+              </p>
               <p className="text-base font-bold text-gray-700">
                 {formatCZK(alternative.finalPortfolio)}
               </p>
@@ -96,6 +137,43 @@ export function ExitSummary() {
               {formatCZK(Math.abs(alternative.advantage))}
             </p>
           </div>
+
+          <details className="mt-3 group">
+            <summary className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-[#2563EB] list-none select-none">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                className="transition-transform group-open:rotate-90"
+              >
+                <path d="M6 4l4 4-4 4V4z" />
+              </svg>
+              Proč se „čistý zisk z prodeje" a „nemovitost na účtu" liší?
+            </summary>
+            <div className="mt-2 text-xs text-gray-500 leading-relaxed space-y-2 pl-[18px]">
+              <p>
+                <span className="font-semibold text-gray-700">Čistý zisk z prodeje</span> ({formatCZK(exit.netSaleProfit)}) je
+                jednorázová hotovost v den prodeje. Dívá se jen na tento okamžik — kolik ti zbyde,
+                když prodáš a splatíš hypotéku.
+              </p>
+              <p>
+                <span className="font-semibold text-gray-700">Nemovitost — na účtu</span> ({formatCZK(alternative.propertyFinalWealth)})
+                je poctivý součet celého příběhu: k výtěžku z prodeje přičte i každou korunu cashflow,
+                ale s ohledem na <span className="font-medium">čas peněz</span> — jako by se dala uložit za{' '}
+                {params.exit.alternativeReturnRate} % p.a. Tvůj cashflow byl{' '}
+                {exit.totalCashflow >= 0 ? 'kladný' : 'záporný'}, takže tato část hodnotu{' '}
+                {exit.totalCashflow >= 0 ? 'zvyšuje' : 'snižuje'}.
+              </p>
+              <p>
+                Rozdíl {formatCZK(Math.abs(exit.netSaleProfit - alternative.propertyFinalWealth))} je{' '}
+                {exit.totalCashflow >= 0
+                  ? 'zhodnocení průběžného kladného cashflow.'
+                  : 'budoucí hodnota všech peněz, které jsi musel do nemovitosti během držení doplatit (úročeno oportunitní sazbou).'}{' '}
+                Právě „nemovitost na účtu" se dá férově porovnat s alternativou vedle.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
     </div>

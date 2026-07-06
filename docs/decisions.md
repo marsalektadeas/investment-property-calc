@@ -1,6 +1,6 @@
 # RentScope — rozhodnutí a stav projektu
 
-> Poslední aktualizace: 2026-06-11. Slouží jako handoff mezi sezeními — co je
+> Poslední aktualizace: 2026-07-06. Slouží jako handoff mezi sezeními — co je
 > hotové, proč, a co zbývá doladit.
 
 ## Aktuální stav
@@ -25,6 +25,7 @@
 | Lead capture | Jen CTA do toolu (MVP) | Nejjednodušší; e-mail gate doplníme později |
 | Social proof | Vynecháno | Bez reálných dat nevymýšlet fake recenze (etický/právní risk) |
 | Výpočet — alternativa | Opraveno: srovnání na jednom terminálním základě | Viz níže |
+| Exit UX — vysvětlení | Přidány tooltips + rozbalovací výklad „proč se čísla liší" | Uživatelé pletli „čistý zisk z prodeje" (hotovost v den prodeje) s „nemovitostí na účtu" (terminální bohatství s časem peněz) |
 
 ## Oprava výpočtu #1 (hotovo)
 
@@ -33,6 +34,33 @@ dvakrát ve prospěch nemovitosti a používalo jinou metodu CAGR než alternati
 Sjednoceno (`lib/alternative.ts`): alternativa = počáteční kapitál složeně
 úročený; nemovitost = výtěžek z prodeje + cashflow reinvestovaný stejnou sazbou.
 Přidáno pole `propertyFinalWealth` do `AlternativeResult`.
+
+## Exit UX — vysvětlení metrik (hotovo 2026-07-06)
+
+Uživatel nechápal rozdíl mezi dvěma čísly v `ExitSummary` a chtěl ho vysvětlit
+přímo v aplikaci. Rozdíl **není bug** — ověřeno výpočtem proti reálným číslům:
+
+- **Čistý zisk z prodeje** (`exit.netSaleProfit`) = hotovost v ruce v den prodeje
+  (cena − hypotéka − náklady − daň). Ignoruje průběžné doplácení.
+- **Nemovitost — na účtu** (`alternative.propertyFinalWealth`) = výtěžek z prodeje
+  + každý roční cashflow reinvestovaný alternativní sazbou (čas peněz). Při
+  záporném cashflow tato část bohatství **snižuje** → bývá nižší než čistý zisk
+  z prodeje. Právě tohle číslo je férově srovnatelné s alternativou.
+
+Rozdíl obou = budoucí hodnota všeho, co majitel do nemovitosti během držení
+doplatil (úročeno oportunitní sazbou).
+
+**Poznámka k metodice:** zelený „Čistý zisk (nad vloženou investicí)"
+(`exit.totalReturn`) používá **nominální** cashflow, kdežto „na účtu" ho **úročí**.
+Není to nekonzistence — jsou to dvě různé otázky (celkový nominální zisk vs.
+terminální bohatství pro férové srovnání). Nový výklad to uživateli pojmenovává.
+
+Implementace:
+- Nová komponenta `components/ui/InfoTooltip.tsx` (hover/tap, align left/right).
+- Tooltips u 4 řádků v `ExitSummary` + rozbalovací `<details>` box s dynamicky
+  dopočítaným rozdílem (funguje pro kladný i záporný cashflow).
+- Opraveno zobrazení: „Kumulovaný cashflow" ukazoval `+ -1 609 164` → nyní
+  znaménkově korektní `− 1 609 164` (helper `signedCZK`).
 
 ## Otevřené TODO (doladíme příště)
 
