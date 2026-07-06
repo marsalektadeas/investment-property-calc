@@ -148,6 +148,12 @@ export interface AlternativeResult {
   totalROI: number              // % z počáteční investice
   annualizedROI: number         // % ročně (CAGR)
   advantage: number             // nemovitost − alternativa (kladné = nem. vyhrává)
+  // Rozpad „Koupím nemovitost"
+  netSaleProfit: number         // čistý výtěžek z prodeje (= exit.netSaleProfit)
+  reinvestedSurplus: number     // přebytkový (kladný) cashflow reinvestovaný do konce
+  // Rozpad „Dám do ETF"
+  etfBaseGrowth: number         // počáteční kapitál složeně úročený
+  etfTopUpsInvested: number     // doplatky (záporný cashflow) investované do ETF
 }
 
 export interface CalculationResult {

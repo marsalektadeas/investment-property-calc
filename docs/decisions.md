@@ -64,6 +64,12 @@ Implementace:
 - `ExitSummary`: dlaždice „Koupím nemovitost" / „Dám do ETF" + podnadpis „Kolik
   budeš mít na účtu", tooltips, přepsaný `<details>` výklad. Info-tooltips i u
   řádků „Čistý zisk z prodeje" a „Kumulovaný cashflow".
+- Každá dlaždice má **rozpad složek** (`BreakdownRow`): nemovitost = výtěžek
+  z prodeje + reinvestovaný přebytek; ETF = počáteční kapitál zúročený +
+  doplatky investované do ETF. Nová pole v `AlternativeResult`
+  (`netSaleProfit`, `reinvestedSurplus`, `etfBaseGrowth`, `etfTopUpsInvested`).
+  Pozn.: do ETF jde jen **doplatek** (záporný cashflow po nájmu), ne celá
+  splátka — nájemce svůj díl už platí a jistina se vrací v prodejní ceně.
 - Opraveno zobrazení: „Kumulovaný cashflow" ukazoval `+ -1 609 164` → nyní
   znaménkově korektní `− 1 609 164` (helper `signedCZK`).
 

@@ -71,5 +71,9 @@ export function calcAlternative(
     totalROI,
     annualizedROI,
     advantage,
+    netSaleProfit,
+    reinvestedSurplus,
+    etfBaseGrowth: baseGrowth,
+    etfTopUpsInvested: topUpsInvested,
   }
 }

@@ -9,6 +9,15 @@ function signedCZK(value: number): string {
   return `${value >= 0 ? '+ ' : '− '}${formatCZK(Math.abs(value))}`
 }
 
+function BreakdownRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between items-baseline gap-2 text-xs">
+      <span className="text-gray-500">{label}</span>
+      <span className="text-gray-700 font-medium tabular-nums whitespace-nowrap">{value}</span>
+    </div>
+  )
+}
+
 function Row({
   label,
   value,
@@ -100,7 +109,7 @@ export function ExitSummary() {
           <p className="text-xs text-gray-400 mb-3">
             Stejná hotovost do obou scénářů — zůstatek na konci roku {params.exit.holdingYears}.
           </p>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="bg-[#EFF6FF] rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
                 Koupím nemovitost
@@ -112,9 +121,10 @@ export function ExitSummary() {
               <p className="text-base font-bold text-[#1E40AF]">
                 {formatCZK(alternative.propertyFinalWealth)}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                výtěžek z prodeje + reinvestovaný přebytek
-              </p>
+              <div className="mt-2 pt-2 border-t border-[#DBEAFE] space-y-1">
+                <BreakdownRow label="Čistý výtěžek z prodeje" value={formatCZK(alternative.netSaleProfit)} />
+                <BreakdownRow label="+ Reinvestovaný přebytek nájmu" value={formatCZK(alternative.reinvestedSurplus)} />
+              </div>
             </div>
             <div className="bg-[#F8FAFC] rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
@@ -127,9 +137,10 @@ export function ExitSummary() {
               <p className="text-base font-bold text-gray-700">
                 {formatCZK(alternative.finalPortfolio)}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                kapitál + doplatky investované do ETF
-              </p>
+              <div className="mt-2 pt-2 border-t border-[#E2E8F0] space-y-1">
+                <BreakdownRow label="Počáteční kapitál (zúročený)" value={formatCZK(alternative.etfBaseGrowth)} />
+                <BreakdownRow label="+ Doplatky investované do ETF" value={formatCZK(alternative.etfTopUpsInvested)} />
+              </div>
             </div>
           </div>
           <div className={`mt-3 rounded-lg p-3 text-center ${alternative.advantage >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
