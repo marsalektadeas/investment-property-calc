@@ -79,5 +79,25 @@ export function calcMortgage(
   const totalPaid = monthlyPayment * mortgage.termYears * 12
   const totalInterest = totalPaid - loanAmount
 
-  return { monthlyPayment, totalInterest, totalPaid, ltv, loanAmount }
+  // Splátka po refixaci — re-amortizace zbylého zůstatku novou sazbou na zbytek doby.
+  // null, když fixace pokrývá celý úvěr nebo se sazba nemění.
+  const fixationMonths = mortgage.fixationYears * 12
+  const totalMonths = mortgage.termYears * 12
+  const rateChanges = Math.abs(mortgage.rateAfterFixation - mortgage.interestRate) > 0.001
+  let monthlyPaymentAfterFixation: number | null = null
+  if (fixationMonths < totalMonths && rateChanges) {
+    const balanceAtFixation = calcLoanBalance(
+      loanAmount,
+      mortgage.interestRate,
+      mortgage.termYears,
+      fixationMonths,
+    )
+    monthlyPaymentAfterFixation = calcMonthlyPayment(
+      balanceAtFixation,
+      mortgage.rateAfterFixation,
+      (totalMonths - fixationMonths) / 12,
+    )
+  }
+
+  return { monthlyPayment, monthlyPaymentAfterFixation, totalInterest, totalPaid, ltv, loanAmount }
 }

@@ -55,6 +55,7 @@ export function calcMetrics(
   return {
     initialInvestment,
     monthlyMortgage: mortgage.monthlyPayment,
+    monthlyMortgageAfterFixation: mortgage.monthlyPaymentAfterFixation,
     monthlyCashflow: monthly.cashflow,
     annualCashflow: annualNetCashflow,
     noi: annualNOI,

@@ -70,6 +70,7 @@ export interface InputParams {
 
 export interface MortgageResult {
   monthlyPayment: number
+  monthlyPaymentAfterFixation: number | null  // splátka po refixaci (null = sazba se nemění)
   totalInterest: number
   totalPaid: number
   ltv: number
@@ -114,6 +115,7 @@ export interface YearlyProjection {
 export interface KeyMetrics {
   initialInvestment: number     // vlastní kapitál + náklady
   monthlyMortgage: number
+  monthlyMortgageAfterFixation: number | null  // splátka po refixaci (null = beze změny)
   monthlyCashflow: number
   annualCashflow: number
   noi: number
@@ -156,6 +158,14 @@ export interface AlternativeResult {
   etfTopUpsInvested: number     // doplatky (záporný cashflow) investované do ETF
 }
 
+export interface SensitivityResult {
+  growthDeltas: number[]        // odchylky zhodnocení nemovitosti (pb) — řádky
+  altDeltas: number[]           // odchylky alternativní sazby (pb) — sloupce
+  baseGrowth: number            // aktuální zhodnocení nemovitosti (%)
+  baseAlt: number               // aktuální alternativní sazba (%)
+  matrix: number[][]            // matrix[řádek][sloupec] = advantage (nemovitost − ETF)
+}
+
 export interface CalculationResult {
   mortgage: MortgageResult
   monthly: MonthlyCashflow
@@ -163,4 +173,5 @@ export interface CalculationResult {
   projections: YearlyProjection[]
   exit: ExitResult
   alternative: AlternativeResult
+  sensitivity: SensitivityResult
 }

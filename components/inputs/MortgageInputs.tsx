@@ -53,6 +53,14 @@ export function MortgageInputs() {
         <span>Měsíční splátka</span>
         <span className="font-semibold text-gray-900">{formatCZK(result.mortgage.monthlyPayment)}</span>
       </div>
+      {result.mortgage.monthlyPaymentAfterFixation != null && (
+        <div className="flex justify-between text-sm text-gray-500">
+          <span>Splátka po fixaci</span>
+          <span className="font-semibold text-amber-600">
+            {formatCZK(result.mortgage.monthlyPaymentAfterFixation)}
+          </span>
+        </div>
+      )}
     </SectionCard>
   )
 }

@@ -1,8 +1,9 @@
 'use client'
 
 import { useCalculatorStore } from '@/store/useCalculatorStore'
-import { formatCZK, formatPercent } from '@/utils/format'
+import { formatCZK, formatCZKShort, formatPercent } from '@/utils/format'
 import { InfoTooltip } from '@/components/ui/InfoTooltip'
+import type { SensitivityResult } from '@/types'
 
 /** Znaménkově čitelný cashflow: „+ 120 000 Kč" / „− 120 000 Kč" */
 function signedCZK(value: number): string {
@@ -14,6 +15,61 @@ function BreakdownRow({ label, value }: { label: string; value: string }) {
     <div className="flex justify-between items-baseline gap-2 text-xs">
       <span className="text-gray-500">{label}</span>
       <span className="text-gray-700 font-medium tabular-nums whitespace-nowrap">{value}</span>
+    </div>
+  )
+}
+
+/** „+1,2 mil. Kč" / „−204 tis. Kč" */
+function signedShort(value: number): string {
+  return `${value >= 0 ? '+' : '−'}${formatCZKShort(Math.abs(value))}`
+}
+
+/** Procenta kompaktně — bez zbytečných desetin (3 %, 2,5 %) */
+function pct(value: number): string {
+  const rounded = Math.round(value * 10) / 10
+  return `${(Number.isInteger(rounded) ? rounded.toString() : rounded.toString().replace('.', ','))} %`
+}
+
+function SensitivityTable({ data }: { data: SensitivityResult }) {
+  return (
+    <div className="overflow-x-auto -mx-1 px-1">
+      <table className="w-full border-collapse text-xs">
+        <thead>
+          <tr>
+            <th className="p-1.5 text-left font-normal text-gray-400 align-bottom">
+              Zhodnocení&nbsp;↓ / ETF&nbsp;→
+            </th>
+            {data.altDeltas.map((d) => (
+              <th key={d} className="p-1.5 text-right font-medium text-gray-500 whitespace-nowrap">
+                {pct(data.baseAlt + d)}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.growthDeltas.map((gd, i) => (
+            <tr key={gd}>
+              <th className="p-1.5 text-left font-medium text-gray-500 whitespace-nowrap">
+                {pct(data.baseGrowth + gd)}
+              </th>
+              {data.altDeltas.map((ad, j) => {
+                const v = data.matrix[i][j]
+                const isBase = gd === 0 && ad === 0
+                return (
+                  <td
+                    key={ad}
+                    className={`p-1.5 text-right tabular-nums whitespace-nowrap rounded ${
+                      v >= 0 ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
+                    } ${isBase ? 'ring-2 ring-inset ring-[#2563EB] font-bold' : 'font-medium'}`}
+                  >
+                    {signedShort(v)}
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
@@ -49,7 +105,8 @@ function Row({
 
 export function ExitSummary() {
   const { result, params } = useCalculatorStore()
-  const { exit, alternative } = result
+  const { exit, alternative, sensitivity } = result
+  const rentBelowInflation = params.rental.annualRentGrowth < params.macro.inflation
 
   return (
     <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
@@ -109,6 +166,17 @@ export function ExitSummary() {
           <p className="text-xs text-gray-400 mb-3">
             Stejná hotovost do obou scénářů — zůstatek na konci roku {params.exit.holdingYears}.
           </p>
+          {rentBelowInflation && (
+            <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 p-3 flex gap-2">
+              <span className="text-amber-500 flex-shrink-0 leading-none text-sm">⚠</span>
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Růst nájmu ({pct(params.rental.annualRentGrowth)}) je pod inflací nákladů (
+                {pct(params.macro.inflation)}). Náklady tak rostou rychleji než příjem a marže se
+                každý rok stlačuje — cashflow se v čase zhoršuje. Zvaž, jestli je odhad růstu nájmu
+                realistický.
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="bg-[#EFF6FF] rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1 flex items-center gap-1.5">
@@ -187,6 +255,25 @@ export function ExitSummary() {
               </p>
             </div>
           </details>
+
+          {/* Citlivost — jak křehký je výsledek */}
+          <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              Co když se odhady netrefí?
+              <InfoTooltip
+                align="left"
+                text="Výsledek stojí hlavně na dvou nejistých číslech: jak poroste cena nemovitosti a jaký výnos by mělo ETF. Tabulka ukazuje rozdíl (nemovitost − ETF) při jejich změně o ±2 pb. Modrý rámeček = tvůj aktuální odhad."
+              />
+            </p>
+            <p className="text-xs text-gray-400 mb-2">
+              Rozdíl nemovitost − ETF. Zeleně = vyhrává nemovitost, červeně = ETF.
+            </p>
+            <SensitivityTable data={sensitivity} />
+            <p className="text-xs text-gray-400 mt-2 leading-relaxed">
+              Když se výsledek mezi buňkami převrací ze zeleného na červený, znamená to, že
+              rozhodnutí visí na odhadu — neber jedno číslo jako jistotu.
+            </p>
+          </div>
         </div>
       </div>
     </div>

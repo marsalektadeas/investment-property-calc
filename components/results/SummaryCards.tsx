@@ -96,9 +96,13 @@ export function SummaryCards() {
         <MetricCard
           label="Měsíční splátka"
           value={formatCZK(metrics.monthlyMortgage)}
-          sub="hypotéka"
+          sub={
+            metrics.monthlyMortgageAfterFixation != null
+              ? `po fixaci ${formatCZK(metrics.monthlyMortgageAfterFixation)}`
+              : 'hypotéka'
+          }
           positive={null}
-          tooltip="Anuitní měsíční splátka hypotéky (úrok + jistina). Po skončení fixace se přepočítá dle nové sazby."
+          tooltip="Anuitní měsíční splátka hypotéky (úrok + jistina). Po skončení fixace se přepočítá dle sazby po fixaci — je-li vyšší, splátka vyskočí."
         />
       </div>
     </div>

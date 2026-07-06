@@ -18,6 +18,7 @@ import { calcMetrics } from '@/lib/metrics'
 import { buildProjections } from '@/lib/projections'
 import { calcExit } from '@/lib/exit'
 import { calcAlternative } from '@/lib/alternative'
+import { calcSensitivity } from '@/lib/sensitivity'
 import { applyScenario } from '@/lib/scenarios'
 
 interface CalculatorStore {
@@ -71,7 +72,9 @@ function calculate(params: InputParams): CalculationResult {
     adjustedParams.exit.holdingYears,
   )
 
-  return { mortgage, monthly, metrics, projections, exit, alternative }
+  const sensitivity = calcSensitivity(adjustedParams, loanAmount, initialInvestment)
+
+  return { mortgage, monthly, metrics, projections, exit, alternative, sensitivity }
 }
 
 const initialResult = calculate(DEFAULT_PARAMS)

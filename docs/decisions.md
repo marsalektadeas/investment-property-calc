@@ -77,13 +77,32 @@ Implementace:
 stále nominální zisk nad vloženou investicí — pro rozhodnutí koupit vs. ETF slouží
 srovnání zůstatků, ne tento řádek (výklad na to upozorňuje).
 
+## Exit — citlivost, splátka po fixaci, varování (hotovo 2026-07-06)
+
+Navazuje na diskuzi o správnosti modelu. Tři vylepšení:
+
+1. **Splátka po fixaci (vyřešeno TODO #4 na úrovni zobrazení).** `calcMortgage`
+   nově vrací `monthlyPaymentAfterFixation` (re-amortizace zůstatku novou sazbou
+   na zbytek doby; `null` když se sazba nemění nebo fixace kryje celý úvěr).
+   Zobrazeno v `SummaryCards` (sub „po fixaci …") a `MortgageInputs` (amber
+   řádek). Jádro výpočtu (cashflow/exit) už fixaci řešilo přes
+   `buildAmortizationTable` — tohle opravuje jen zavádějící headline číslo.
+2. **Citlivostní tabulka** (`lib/sensitivity.ts` → `SensitivityResult` v
+   `CalculationResult`, `SensitivityTable` v `ExitSummary`). Mřížka 3×3: zhodnocení
+   nemovitosti (±2 pb) × alternativní sazba (±2 pb), buňka = `advantage`. Střední
+   buňka = aktuální odhad (odpovídá `alternative.advantage`). Ukazuje křehkost
+   výsledku — „nedívej se na jedno číslo".
+3. **Varování nájem < inflace** — amber banner v `ExitSummary`, když
+   `rental.annualRentGrowth < macro.inflation` (stlačování marže v čase).
+
 ## Otevřené TODO (doladíme příště)
 
 ### Výpočty (z analýzy, zbývající)
 - **#2** `taxableIncome` v měsíčním cashflow ignoruje daňový režim a úrok
   (`lib/cashflow.ts`) — kosmetické, pole se zdá nepoužité v UI.
-- **#4** `totalInterest`/headline splátka v `calcMortgage` ignoruje sazbu po
-  fixaci (`lib/mortgage.ts`) — podhodnocený celkový úrok.
+- **#4** ~~headline splátka ignoruje sazbu po fixaci~~ → zobrazení opraveno
+  (splátka po fixaci). Zbývá: `totalInterest`/`totalPaid` v `calcMortgage` stále
+  dvoufázově nepočítá — podhodnocený celkový úrok (kosmetika, není v jádru).
 - **#5** `otherIncome` (parkování) se krátí neobsazeností — typicky nemá.
 - **#6** Daň z kapitálového zisku neodečítá rekonstrukci/náklady na pořízení.
 - **#7** Odpisy 1,125 % p.a. — zjednodušení (skupina 5 reálně 1,4 % → 3,4 %).
