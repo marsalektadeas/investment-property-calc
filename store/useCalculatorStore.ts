@@ -108,10 +108,7 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
     set({ params, result: calculate(params) })
   },
   setExit: (p) => {
-    const exit = { ...get().params.exit, ...p }
-    // Horizont přehledu nesmí končit před rokem prodeje.
-    exit.projectionYears = Math.max(exit.projectionYears, exit.holdingYears)
-    const params = { ...get().params, exit }
+    const params = { ...get().params, exit: { ...get().params.exit, ...p } }
     set({ params, result: calculate(params) })
   },
   setScenario: (scenario) => {

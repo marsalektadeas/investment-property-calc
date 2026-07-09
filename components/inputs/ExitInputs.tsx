@@ -18,17 +18,6 @@ export function ExitInputs() {
         step={1}
         unit="let"
         onChange={(v) => setExit({ holdingYears: v })}
-        hint="Rok prodeje"
-      />
-      <SliderInput
-        label="Horizont přehledu"
-        value={exit.projectionYears}
-        min={exit.holdingYears}
-        max={50}
-        step={1}
-        unit="let"
-        onChange={(v) => setExit({ projectionYears: v })}
-        hint="Kam sahá tabulka i po splacení hypotéky"
       />
       <SliderInput
         label="Náklady na prodej"

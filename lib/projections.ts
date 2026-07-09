@@ -5,9 +5,7 @@ import { toReal } from '@/utils/inflation'
 
 export function buildProjections(params: InputParams, loanAmount: number): YearlyProjection[] {
   const { rental, macro, mortgage, tax, property } = params
-  // Přehled sahá po horizont (projectionYears), ne jen po rok prodeje —
-  // ať jsou vidět i roky po splacení hypotéky (čistý nájem bez splátky).
-  const years = Math.max(params.exit.projectionYears, params.exit.holdingYears)
+  const years = params.exit.holdingYears
   const amortization = buildAmortizationTable(loanAmount, mortgage)
 
   const projections: YearlyProjection[] = []
