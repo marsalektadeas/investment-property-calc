@@ -46,6 +46,7 @@ export interface MacroParams {
 
 export interface ExitParams {
   holdingYears: number
+  projectionYears: number       // délka přehledu cashflow (nezávislá na roku prodeje)
   sellingCosts: number          // % z prodejní ceny
   capitalGainsTax: number       // % ze zisku
   alternativeReturnRate: number // % ročně (alternativní investice)

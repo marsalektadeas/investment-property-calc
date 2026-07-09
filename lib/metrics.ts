@@ -43,9 +43,11 @@ export function calcMetrics(
       ? ((monthly.operatingCosts + monthly.mortgagePayment) / grossMonthlyRent) * 100
       : 100
 
-  // Doba návratnosti — kdy kumulativní cashflow (po daních) pokryje počáteční investici
+  // Doba návratnosti — kdy kumulativní cashflow (po daních) pokryje počáteční
+  // investici. Jen v rámci doby držení (přehled může sahat dál kvůli zobrazení).
   let paybackYears: number | null = null
   for (const p of projections) {
+    if (p.year > params.exit.holdingYears) break
     if (p.cumulativeNetCashflow >= initialInvestment) {
       paybackYears = p.year
       break

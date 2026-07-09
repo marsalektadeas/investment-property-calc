@@ -95,6 +95,36 @@ Navazuje na diskuzi o správnosti modelu. Tři vylepšení:
 3. **Varování nájem < inflace** — amber banner v `ExitSummary`, když
    `rental.annualRentGrowth < macro.inflation` (stlačování marže v čase).
 
+## Horizont přehledu oddělený od roku prodeje (hotovo 2026-07-09)
+
+Uživatel chtěl vidět, **kolik nemovitost vynáší po splacené hypotéce** (čistý nájem
+bez splátky) — natáhnout přehled cashflow klidně na 50 let. Dosud `holdingYears`
+řídil zároveň (1) délku tabulky i (2) rok prodeje, a jeho max byl 30 = splatnost
+hypotéky → roky bez hypotéky se nikdy nevykreslily.
+
+**Jádro už čistý nájem po splacení počítalo správně** — po `termYears × 12`
+měsících nejsou v amortizaci žádné řádky, takže `buildProjections` dává pro rok
+31+ splátku 0, úrok 0, zůstatek 0 → cashflow = NOI (po dani). Ověřeno: 30letá
+hypotéka, rok 30 zůstatek 0, rok 31+ splátka 0. Problém byl **jen zobrazovací**.
+
+Řešení — nový vstup `exit.projectionYears` (délka přehledu, nezávislá na prodeji):
+- `lib/projections.ts` — smyčka do `max(projectionYears, holdingYears)`.
+- `ExitInputs` — nový posuvník „Horizont přehledu" (max 50, ruční zadání čísla
+  přes textové pole SliderInput). „Doba držení" dostala hint „Rok prodeje".
+- `store.setExit` — clamp `projectionYears ≥ holdingYears` (přehled nesmí končit
+  před prodejem).
+- **Korektnost:** `lib/alternative.ts` sčítalo přes všechny projekce → přidán
+  `projections.slice(0, holdingYears)`. Roky po prodeji do scénáře „koupím vs.
+  ETF" nepatří (jinak by FV počítalo doplatky/přebytky za rokem prodeje v nominále).
+- `lib/metrics.ts` — payback scan omezen na `holdingYears` (zachování významu).
+- `YearlyTable` — rok prodeje má badge „prodej", roky bez hypotéky mají v buňce
+  Hypotéka „—", jemný emerald tint a legendu „bez hypotéky".
+- `calcExit` beze změny (indexuje `projections[holdingYears−1]`), `calcSensitivity`
+  pokryto opravou v `alternative.ts`. Grafy a PDF export se protáhnou automaticky.
+
+Default `projectionYears = 30` (celý životní cyklus hypotéky; pro roky bez
+hypotéky přetáhni na 31+).
+
 ## Otevřené TODO (doladíme příště)
 
 ### Výpočty (z analýzy, zbývající)

@@ -34,12 +34,17 @@ export function calcAlternative(
 ): AlternativeResult {
   const rate = returnRate / 100
 
+  // Přehled může sahat za rok prodeje (kvůli zobrazení čistého nájmu po splacení
+  // hypotéky). Srovnání „koupím vs. ETF" ale končí prodejem — roky po prodeji do
+  // scénáře „koupím" nepatří. Proto počítáme jen do roku prodeje.
+  const held = projections.slice(0, holdingYears)
+
   // Budoucí hodnota částky vložené na konci roku Y → roste (holdingYears − Y) let.
   const fvAtRate = (amount: number, yearIndex: number) =>
     amount * Math.pow(1 + rate, Math.max(0, holdingYears - (yearIndex + 1)))
 
   // Nemovitost: výtěžek z prodeje + reinvestovaný přebytkový (kladný) cashflow.
-  const reinvestedSurplus = projections.reduce(
+  const reinvestedSurplus = held.reduce(
     (sum, p, i) => sum + fvAtRate(Math.max(0, p.netCashflow), i),
     0,
   )
@@ -47,7 +52,7 @@ export function calcAlternative(
 
   // ETF: počáteční kapitál + doplatky (záporný cashflow) investované do ETF.
   const baseGrowth = initialInvestment * Math.pow(1 + rate, holdingYears)
-  const topUpsInvested = projections.reduce(
+  const topUpsInvested = held.reduce(
     (sum, p, i) => sum + fvAtRate(Math.max(0, -p.netCashflow), i),
     0,
   )
@@ -56,7 +61,7 @@ export function calcAlternative(
   // Kolik jsi do ETF celkem vložil (nominálně) — pro výnos alternativy.
   const totalContributed =
     initialInvestment +
-    projections.reduce((sum, p) => sum + Math.max(0, -p.netCashflow), 0)
+    held.reduce((sum, p) => sum + Math.max(0, -p.netCashflow), 0)
 
   const totalReturn = finalPortfolio - totalContributed
   const totalROI = totalContributed > 0 ? (totalReturn / totalContributed) * 100 : 0
