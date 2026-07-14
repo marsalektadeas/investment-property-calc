@@ -30,7 +30,7 @@ function pct(value: number): string {
   return `${(Number.isInteger(rounded) ? rounded.toString() : rounded.toString().replace('.', ','))} %`
 }
 
-function SensitivityTable({ data }: { data: SensitivityResult }) {
+function SensitivityTable({ data, divisor }: { data: SensitivityResult; divisor: number }) {
   return (
     <div className="overflow-x-auto -mx-1 px-1">
       <table className="w-full border-collapse text-xs">
@@ -53,7 +53,7 @@ function SensitivityTable({ data }: { data: SensitivityResult }) {
                 {pct(data.baseGrowth + gd)}
               </th>
               {data.altDeltas.map((ad, j) => {
-                const v = data.matrix[i][j]
+                const v = data.matrix[i][j] / divisor
                 const isBase = gd === 0 && ad === 0
                 return (
                   <td
@@ -108,51 +108,63 @@ export function ExitSummary() {
   const { exit, alternative, sensitivity } = result
   const rentBelowInflation = params.rental.annualRentGrowth < params.macro.inflation
 
+  // „Po inflaci": všechny terminální hodnoty (rok N) diskontuj na dnešní kupní sílu.
+  // Kumulovaný cashflow a návratnosti mají vlastní reálné varianty z exit.ts (per-year diskont).
+  const real = params.showInflationAdjusted
+  const realFactor = Math.pow(1 + params.macro.inflation / 100, params.exit.holdingYears)
+  const today = (v: number) => (real ? v / realFactor : v)
+
+  const totalCashflow = real ? exit.realTotalCashflow : exit.totalCashflow
+  const totalReturn = real ? exit.realTotalReturn : exit.totalReturn
+  const totalROI = real ? exit.realTotalROI : exit.totalROI
+  const annualizedROI = real ? exit.realAnnualizedROI : exit.annualizedROI
+
   return (
     <div className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
       <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
         <span className="w-0.5 h-3.5 bg-[#2563EB] rounded-full flex-shrink-0" />
         Výpočet při prodeji — rok {params.exit.holdingYears}
+        {real && <span className="text-[#2563EB] normal-case tracking-normal font-medium">· dnešní ceny</span>}
       </h3>
 
       <div className="space-y-0">
-        <Row label="Odhadovaná cena nemovitosti" value={formatCZK(exit.projectedValue)} />
-        <Row label="Zůstatek hypotéky" value={`− ${formatCZK(exit.remainingLoan)}`} />
-        <Row label="Náklady na prodej" value={`− ${formatCZK(exit.sellingCosts)}`} />
+        <Row label="Odhadovaná cena nemovitosti" value={formatCZK(today(exit.projectedValue))} />
+        <Row label="Zůstatek hypotéky" value={`− ${formatCZK(today(exit.remainingLoan))}`} />
+        <Row label="Náklady na prodej" value={`− ${formatCZK(today(exit.sellingCosts))}`} />
         {exit.capitalGainsTax > 0 && (
-          <Row label="Daň z prodeje" value={`− ${formatCZK(exit.capitalGainsTax)}`} />
+          <Row label="Daň z prodeje" value={`− ${formatCZK(today(exit.capitalGainsTax))}`} />
         )}
         <Row
           label="Čistý zisk z prodeje"
-          value={formatCZK(exit.netSaleProfit)}
+          value={formatCZK(today(exit.netSaleProfit))}
           highlight="neutral"
           tooltip="Hotovost, kterou dostaneš v ruce v den prodeje: prodejní cena − zůstatek hypotéky − náklady na prodej − daň. Neobsahuje peníze, které jsi do nemovitosti během držení průběžně vkládal."
         />
         <Row
           label="Kumulovaný cashflow"
-          value={signedCZK(exit.totalCashflow)}
-          highlight={exit.totalCashflow >= 0 ? 'positive' : 'negative'}
+          value={signedCZK(totalCashflow)}
+          highlight={totalCashflow >= 0 ? 'positive' : 'negative'}
           tooltip="Součet ročních čistých cashflow (po daních) za celou dobu držení. Kladné = nájem pokryl splátku i náklady a ještě zbylo. Záporné = každý rok jsi musel doplácet z vlastní kapsy."
         />
 
         <div className="mt-3 pt-3 border-t border-[#E2E8F0] space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-gray-700">Čistý zisk (nad vloženou investicí)</span>
-            <span className={`text-lg font-bold ${exit.totalReturn >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {formatCZK(exit.totalReturn)}
+            <span className={`text-lg font-bold ${totalReturn >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+              {formatCZK(totalReturn)}
             </span>
           </div>
           <div className="grid grid-cols-2 gap-3 mt-2">
             <div className="bg-[#F8FAFC] rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400 mb-1">ROI celkové</p>
-              <p className={`text-lg font-bold ${exit.totalROI >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                {formatPercent(exit.totalROI, 0)}
+              <p className="text-xs text-gray-400 mb-1">ROI celkové{real && ' · reálné'}</p>
+              <p className={`text-lg font-bold ${totalROI >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                {formatPercent(totalROI, 0)}
               </p>
             </div>
             <div className="bg-[#F8FAFC] rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-400 mb-1">Anualizované ROI</p>
-              <p className={`text-lg font-bold ${exit.annualizedROI >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                {formatPercent(exit.annualizedROI, 1)}
+              <p className="text-xs text-gray-400 mb-1">Anualizované ROI{real && ' · reálné'}</p>
+              <p className={`text-lg font-bold ${annualizedROI >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                {formatPercent(annualizedROI, 1)}
               </p>
             </div>
           </div>
@@ -162,6 +174,7 @@ export function ExitSummary() {
         <div className="mt-4 pt-4 border-t border-[#E2E8F0]">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             Kolik budeš mít na účtu ({params.exit.alternativeReturnRate} % p.a.)
+            {real && <span className="text-[#2563EB] normal-case tracking-normal"> · dnešní ceny</span>}
           </p>
           <p className="text-xs text-gray-400 mb-3">
             Stejná hotovost do obou scénářů — zůstatek na konci roku {params.exit.holdingYears}.
@@ -187,11 +200,11 @@ export function ExitSummary() {
                 />
               </p>
               <p className="text-base font-bold text-[#1E40AF]">
-                {formatCZK(alternative.propertyFinalWealth)}
+                {formatCZK(today(alternative.propertyFinalWealth))}
               </p>
               <div className="mt-2 pt-2 border-t border-[#DBEAFE] space-y-1">
-                <BreakdownRow label="Čistý výtěžek z prodeje" value={formatCZK(alternative.netSaleProfit)} />
-                <BreakdownRow label="+ Reinvestovaný přebytek nájmu" value={formatCZK(alternative.reinvestedSurplus)} />
+                <BreakdownRow label="Čistý výtěžek z prodeje" value={formatCZK(today(alternative.netSaleProfit))} />
+                <BreakdownRow label="+ Reinvestovaný přebytek nájmu" value={formatCZK(today(alternative.reinvestedSurplus))} />
               </div>
             </div>
             <div className="bg-[#F8FAFC] rounded-lg p-3">
@@ -203,11 +216,11 @@ export function ExitSummary() {
                 />
               </p>
               <p className="text-base font-bold text-gray-700">
-                {formatCZK(alternative.finalPortfolio)}
+                {formatCZK(today(alternative.finalPortfolio))}
               </p>
               <div className="mt-2 pt-2 border-t border-[#E2E8F0] space-y-1">
-                <BreakdownRow label="Počáteční kapitál (zúročený)" value={formatCZK(alternative.etfBaseGrowth)} />
-                <BreakdownRow label="+ Doplatky investované do ETF" value={formatCZK(alternative.etfTopUpsInvested)} />
+                <BreakdownRow label="Počáteční kapitál (zúročený)" value={formatCZK(today(alternative.etfBaseGrowth))} />
+                <BreakdownRow label="+ Doplatky investované do ETF" value={formatCZK(today(alternative.etfTopUpsInvested))} />
               </div>
             </div>
           </div>
@@ -216,7 +229,7 @@ export function ExitSummary() {
               {alternative.advantage >= 0 ? 'Nemovitostí získáš navíc' : 'V ETF získáš navíc'}
             </p>
             <p className={`text-lg font-bold ${alternative.advantage >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {formatCZK(Math.abs(alternative.advantage))}
+              {formatCZK(today(Math.abs(alternative.advantage)))}
             </p>
           </div>
 
@@ -239,17 +252,17 @@ export function ExitSummary() {
                 počáteční kapitál teď a případné doplatky do hypotéky každý rok. Jinak by srovnání nebylo férové.
               </p>
               <p>
-                <span className="font-semibold text-gray-700">Koupím nemovitost</span> ({formatCZK(alternative.propertyFinalWealth)}):
-                čistý výtěžek z prodeje ({formatCZK(exit.netSaleProfit)}) + přebytkový nájem reinvestovaný do ETF.
+                <span className="font-semibold text-gray-700">Koupím nemovitost</span> ({formatCZK(today(alternative.propertyFinalWealth))}):
+                čistý výtěžek z prodeje ({formatCZK(today(exit.netSaleProfit))}) + přebytkový nájem reinvestovaný do ETF.
                 Doplatky, které jsi během let posílal do hypotéky, dostáváš zpět v prodejní ceně.
               </p>
               <p>
-                <span className="font-semibold text-gray-700">Dám do ETF</span> ({formatCZK(alternative.finalPortfolio)}):
+                <span className="font-semibold text-gray-700">Dám do ETF</span> ({formatCZK(today(alternative.finalPortfolio))}):
                 počáteční kapitál + každý doplatek, který bys jinak poslal do hypotéky, necháš růst
                 v ETF za {params.exit.alternativeReturnRate} % p.a.
               </p>
               <p className="text-gray-400">
-                Pozn.: „Čistý zisk z prodeje" ({formatCZK(exit.netSaleProfit)}) výše je jen hotovost v den prodeje —
+                Pozn.: „Čistý zisk z prodeje“ ({formatCZK(today(exit.netSaleProfit))}) výše je jen hotovost v den prodeje —
                 neřeší, kolik jsi do nemovitosti během let vložil. Pro rozhodnutí koupit vs. ETF se řiď tímhle
                 srovnáním zůstatků na účtu.
               </p>
@@ -268,7 +281,7 @@ export function ExitSummary() {
             <p className="text-xs text-gray-400 mb-2">
               Rozdíl nemovitost − ETF. Zeleně = vyhrává nemovitost, červeně = ETF.
             </p>
-            <SensitivityTable data={sensitivity} />
+            <SensitivityTable data={sensitivity} divisor={real ? realFactor : 1} />
             <p className="text-xs text-gray-400 mt-2 leading-relaxed">
               Když se výsledek mezi buňkami převrací ze zeleného na červený, znamená to, že
               rozhodnutí visí na odhadu — neber jedno číslo jako jistotu.

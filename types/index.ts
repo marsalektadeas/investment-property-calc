@@ -141,6 +141,13 @@ export interface ExitResult {
   totalReturn: number           // čistý zisk z prodeje + cashflow
   totalROI: number              // % z počáteční investice
   annualizedROI: number         // % ročně (CAGR)
+  // Reálné (po inflaci) varianty — přepočet na dnešní kupní sílu.
+  // Terminální hodnoty (cena, zisk z prodeje…) se diskontují (1+inflace)^roky přímo v komponentě;
+  // tyto čtyři závisí na kumulovaném cashflow, tak se počítají tady se správným per-year diskontem.
+  realTotalCashflow: number
+  realTotalReturn: number
+  realTotalROI: number
+  realAnnualizedROI: number     // reálný CAGR ≈ nominální − inflace
 }
 
 export interface AlternativeResult {
