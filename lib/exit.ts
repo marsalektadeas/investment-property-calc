@@ -42,6 +42,18 @@ export function calcExit(
       ? (Math.pow(cumulativeMultiple, 1 / holdingYears) - 1) * 100
       : 0
 
+  // Reálné (po inflaci) varianty
+  const realFactor = Math.pow(1 + params.macro.inflation / 100, holdingYears)
+  const realNetSaleProfit = netSaleProfit / realFactor // terminální hodnota → prostá diskontace
+  const realTotalCashflow = exitProjection.cumulativeRealNetCashflow // per-year diskontovaný součet
+  const realTotalReturn = realNetSaleProfit + realTotalCashflow - initialInvestment
+  const realTotalROI = (realTotalReturn / initialInvestment) * 100
+  const realCumulativeMultiple = 1 + realTotalReturn / initialInvestment
+  const realAnnualizedROI =
+    holdingYears > 0 && realCumulativeMultiple > 0
+      ? (Math.pow(realCumulativeMultiple, 1 / holdingYears) - 1) * 100
+      : 0
+
   return {
     projectedValue,
     remainingLoan,
@@ -53,5 +65,9 @@ export function calcExit(
     totalReturn,
     totalROI,
     annualizedROI,
+    realTotalCashflow,
+    realTotalReturn,
+    realTotalROI,
+    realAnnualizedROI,
   }
 }

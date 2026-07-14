@@ -9,6 +9,12 @@ export function SummaryCards() {
   const { metrics } = result
 
   const cashflowValue = params.showAfterTax ? result.monthly.netCashflow : result.monthly.cashflow
+  const cashflowSub = [
+    params.showAfterTax ? 'po daních' : 'před daněmi',
+    params.showInflationAdjusted ? 'dnešní ceny' : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
 
   return (
     <div className="space-y-3">
@@ -16,10 +22,10 @@ export function SummaryCards() {
         <MetricCard
           label="Měsíční cashflow"
           value={formatCZK(cashflowValue)}
-          sub={params.showAfterTax ? 'po daních' : 'před daněmi'}
+          sub={cashflowSub}
           positive={cashflowValue >= 0}
           large
-          tooltip="Čistý příjem z nájmu po odečtení všech nákladů a splátky hypotéky. Kladný cashflow znamená, že nemovitost na sebe vydělá."
+          tooltip="Čistý příjem z nájmu po odečtení všech nákladů a splátky hypotéky. Kladný cashflow znamená, že nemovitost na sebe vydělá. Toto je aktuální měsíční částka (dnešní ceny) — přepínač „Po inflaci“ ovlivňuje projekci v grafu a roční tabulce, ne toto číslo."
         />
         <MetricCard
           label="Počáteční investice"
