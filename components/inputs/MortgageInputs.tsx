@@ -3,7 +3,7 @@
 import { useCalculatorStore } from '@/store/useCalculatorStore'
 import { SliderInput } from '@/components/ui/SliderInput'
 import { SectionCard } from './SectionCard'
-import { formatCZK } from '@/utils/format'
+import { formatCZK, formatPercent } from '@/utils/format'
 
 export function MortgageInputs() {
   const { params, result, setMortgage } = useCalculatorStore()
@@ -50,12 +50,24 @@ export function MortgageInputs() {
         onChange={(v) => setMortgage({ rateAfterFixation: v })}
       />
       <div className="pt-1 flex justify-between text-sm text-gray-500 border-t border-gray-100">
+        <span>Výše úvěru</span>
+        <span className="font-semibold text-gray-900">{formatCZK(result.mortgage.loanAmount)}</span>
+      </div>
+      <div className="flex justify-between text-sm text-gray-500">
         <span>Měsíční splátka</span>
         <span className="font-semibold text-gray-900">{formatCZK(result.mortgage.monthlyPayment)}</span>
       </div>
       {result.mortgage.monthlyPaymentAfterFixation != null && (
         <div className="flex justify-between text-sm text-gray-500">
-          <span>Splátka po fixaci</span>
+          <span>
+            Splátka po fixaci
+            {result.mortgage.effectiveRateAfterFixation != null && (
+              <span className="text-gray-400">
+                {' '}
+                ({formatPercent(result.mortgage.effectiveRateAfterFixation, 2)})
+              </span>
+            )}
+          </span>
           <span className="font-semibold text-amber-600">
             {formatCZK(result.mortgage.monthlyPaymentAfterFixation)}
           </span>

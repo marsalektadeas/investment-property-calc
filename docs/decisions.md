@@ -1,6 +1,6 @@
 # RentScope — rozhodnutí a stav projektu
 
-> Poslední aktualizace: 2026-07-06. Slouží jako handoff mezi sezeními — co je
+> Poslední aktualizace: 2026-08-17. Slouží jako handoff mezi sezeními — co je
 > hotové, proč, a co zbývá doladit.
 
 ## Aktuální stav
@@ -95,15 +95,101 @@ Navazuje na diskuzi o správnosti modelu. Tři vylepšení:
 3. **Varování nájem < inflace** — amber banner v `ExitSummary`, když
    `rental.annualRentGrowth < macro.inflation` (stlačování marže v čase).
 
+## Volič „Po inflaci" rozšířen na Exit blok + reálný CAGR (hotovo 2026-07-14, PR #1)
+
+**Problém:** Uživatel testoval volič „Po inflaci" (`showInflationAdjusted`) a „nic
+se nedělo s čísly". Zjištění: volič ovlivňoval **jen** graf cashflow
+(`CashflowChart`) a roční tabulku (`YearlyTable`). Headline karta „Měsíční
+cashflow" je snapshot **roku 0** (reálná = nominální z definice → nikdy se
+nemění), a hlavně celý **Exit blok** (prodejní cena, čistý zisk, ROI, CAGR, ETF
+srovnání) byl **čistě nominální** — výnos se s inflací neměnil, i když by měl.
+
+**Řešení:**
+- **Exit blok reaguje na volič.** Terminální hodnoty roku N (cena, zůstatek,
+  náklady, daň, čistý zisk z prodeje, ETF zůstatky, citlivostní buňky) se
+  diskontují na dnešní kupní sílu `/(1+inflace)^N` přímo v `ExitSummary`
+  (`today()` helper + `divisor` u `SensitivityTable`).
+- **Cashflow-závislé metriky mají vlastní reálné varianty v `lib/exit.ts`**
+  (`realTotalCashflow` = `cumulativeRealNetCashflow` — per-year diskont, ne
+  blanket; `realTotalReturn` / `realTotalROI` / `realAnnualizedROI`). Reálný CAGR
+  ≈ nominální − inflace. `initialInvestment` (rok 0) se nediskontuje.
+- **Diskontace obou stran ETF srovnání stejným faktorem nemění, kdo vyhrává** —
+  jen velikost v dnešní hodnotě. Barvy/sign se nepřevrací.
+- **UI signály:** `· dnešní ceny` v titulu Exit karty a v ETF srovnání, ROI/CAGR
+  přeznačené `· reálné`. Headline „Měsíční cashflow" dostal jen `· dnešní ceny`
+  popisek (hodnota se nemění — rok 0).
+- Výnosnostní metriky (Cap Rate, CoC, DSCR, hrubá výnosnost) zůstávají nominální
+  **záměrně** — jsou to poměry roku 1, inflace se jich netýká.
+
+Nová pole v `ExitResult`: `realTotalCashflow`, `realTotalReturn`, `realTotalROI`,
+`realAnnualizedROI`. Při ukládání do BuyFlat backendu se persistuje nominální
+payload — volič je jen view preference. Mimochodem opraven i pre-existing
+unescaped-quote lint error v `ExitSummary`.
+
+## Zadání úvěru + opravy hypotéky (hotovo 2026-08-17)
+
+**Problém:** Uživatel měl nabídku z banky (5 mil., 5 %, ~30 tis./měs.) a v appce
+se na tu splátku nedostal — vyhodnotil to jako chybu ve výpočtu. Anuita byla
+přitom správná (ověřeno proti uzavřenému vzorci: zůstatek po fixaci sedí
+s amortizační tabulkou na haléř, konečný zůstatek přesně 0).
+
+**Skutečná příčina — vstup, ne výpočet.** Appka nemá pole „výše úvěru", jistina
+se odvozuje jako `purchasePrice − equity`. „5 mil." zadaných do *Ceny nemovitosti*
+znamenalo s výchozí akontací 900 tis. úvěr jen 4,1 mil. Rozpad rozdílu:
+
+| krok | splátka | vliv |
+|---|---|---|
+| banka: 5 000 000, 5 %, ~24 let | 29 845 Kč | — |
+| appka má 30 let místo 24 | 26 841 Kč | −3 004 Kč |
+| „5 mil" bere jako cenu → úvěr 4,1 mil | 22 010 Kč | **−4 831 Kč (66 %)** |
+| výchozí sazba 5,2 % místo 5,0 % | 22 514 Kč | +504 Kč |
+
+**Řešení:**
+- **Přepínač „Zadám akontaci / Zadám výši úvěru"** v `PropertyInputs`. Lokální
+  `useState`, **ne** součást `InputParams` — je to způsob zadání, ne vstup
+  výpočtu, do `lib/` se nepropisuje nic. Cena nemovitosti zůstává samostatná
+  v obou režimech (je základ pro cap rate, odpisy i exit). Režim „úvěr" zapisuje
+  přes stávající `setProperty({ equity: purchasePrice − v })` — žádný nový setter,
+  žádný druhý zdroj pravdy. Výchozí režim zůstává *akontace* (nemenit default view).
+- **Clamp akontace** na `<0; purchasePrice>` v `setProperty`. Předtím šlo snížit
+  cenu pod akontaci a dostat **záporný úvěr** a LTV −80 %.
+- **Výše úvěru je vidět v obou režimech** (hint u slideru + řádek v panelu
+  Hypotéka). Dřív jen jako podtitulek LTV karty ve výsledcích, daleko od splátky.
+- **#4 dokončeno** — `totalInterest`/`totalPaid` z amortizační tabulky.
+- **Sazba u „Splátky po fixaci"** — nové pole `effectiveRateAfterFixation`
+  v `MortgageResult`. Scénář `rateAfterFixation` posouvá (konzervativní +1 p.b.),
+  takže částka dřív nesouhlasila se sliderem přímo nad ní.
+
+**Vědomě neřešeno:** pojištění (banka ho často do splátky započítá, appka počítá
+čistou anuitu a pojištění drží v provozních nákladech) · LTV > 100 % (hypotéka
+zahrnující rekonstrukci) · clamp akontace se provede tiše, bez hlášky.
+
 ## Otevřené TODO (doladíme příště)
 
 ### Výpočty (z analýzy, zbývající)
 - **#2** `taxableIncome` v měsíčním cashflow ignoruje daňový režim a úrok
   (`lib/cashflow.ts`) — kosmetické, pole se zdá nepoužité v UI.
-- **#4** ~~headline splátka ignoruje sazbu po fixaci~~ → zobrazení opraveno
-  (splátka po fixaci). Zbývá: `totalInterest`/`totalPaid` v `calcMortgage` stále
-  dvoufázově nepočítá — podhodnocený celkový úrok (kosmetika, není v jádru).
-- **#5** `otherIncome` (parkování) se krátí neobsazeností — typicky nemá.
+- **#4** ~~headline splátka ignoruje sazbu po fixaci~~ → vyřešeno celé.
+  `totalInterest`/`totalPaid` v `calcMortgage` se počítají sumou z amortizační
+  tabulky místo `splátka × počet měsíců` (na 4 mil. / 5,2 % → 4,5 % šlo
+  o nadhodnocení úroku o 447 tis. Kč). Panel Hypotéka navíc píše u splátky po
+  fixaci sazbu, ze které se počítá — scénář ji posouvá (konzervativní +1 p.b.),
+  takže dřív nesouhlasila se sliderem nad ní.
+- **#5** `otherIncome` je HORŠÍ, než tu stálo (ověřeno 2026-08-17): nejen že se
+  krátí neobsazeností — do `buildProjections` **nevstupuje vůbec**, používá se
+  jen v `lib/cashflow.ts:58`. Při parkování 2 000 Kč/měs ukáže headline karta
+  −6 055 Kč, ale graf a tabulka pro tentýž rok −7 755 Kč; za 10 let chybí
+  v exitu a ETF srovnání ~228 tis. Kč. Latentní jen proto, že default je 0.
+- **#8** Odpisy se počítají v projekcích, ale `calcMonthlyCashflow` volá
+  `calcTax` bez nich → headline karta zdaňuje rok 1 jinak než tabulka.
+  U výchozích hodnot schované (daň = 0), při LTV 22 % / nájmu 22 000 rozdíl
+  629 Kč/měs. Společná příčina s #5: **rok 1 se počítá dvěma nezávislými
+  cestami.** Opravit najednou — nechat headline kartu číst `projections[0]`,
+  jinak se stejná divergence vrátí u dalšího pole.
+- **#9** DSCR a break-even obsazenost (`lib/metrics.ts:34,43`) znají jen splátku
+  před fixací. U konzervativního scénáře splátka po fixaci vyskočí o ~10 %,
+  což DSCR nevidí. Produktové rozhodnutí: označit jako „rok 1", nebo přidat
+  druhou hodnotu.
 - **#6** Daň z kapitálového zisku neodečítá rekonstrukci/náklady na pořízení.
 - **#7** Odpisy 1,125 % p.a. — zjednodušení (skupina 5 reálně 1,4 % → 3,4 %).
 

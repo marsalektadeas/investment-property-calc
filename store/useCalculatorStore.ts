@@ -84,7 +84,11 @@ export const useCalculatorStore = create<CalculatorStore>((set, get) => ({
   result: initialResult,
 
   setProperty: (p) => {
-    const params = { ...get().params, property: { ...get().params.property, ...p } }
+    const property = { ...get().params.property, ...p }
+    // Akontace nesmí přerůst cenu — jinak by úvěr vyšel záporný.
+    // Hlídáme tady, protože cena i akontace se mění nezávisle na sobě.
+    property.equity = Math.min(Math.max(0, property.equity), property.purchasePrice)
+    const params = { ...get().params, property }
     set({ params, result: calculate(params) })
   },
   setMortgage: (p) => {

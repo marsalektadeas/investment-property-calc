@@ -71,6 +71,7 @@ export interface InputParams {
 export interface MortgageResult {
   monthlyPayment: number
   monthlyPaymentAfterFixation: number | null  // splátka po refixaci (null = sazba se nemění)
+  effectiveRateAfterFixation: number | null   // sazba po fixaci včetně úpravy scénářem
   totalInterest: number
   totalPaid: number
   ltv: number
