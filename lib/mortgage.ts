@@ -76,8 +76,16 @@ export function calcMortgage(
   const loanAmount = property.purchasePrice - property.equity
   const ltv = (loanAmount / property.purchasePrice) * 100
   const monthlyPayment = calcMonthlyPayment(loanAmount, mortgage.interestRate, mortgage.termYears)
-  const totalPaid = monthlyPayment * mortgage.termYears * 12
-  const totalInterest = totalPaid - loanAmount
+
+  // Celkově zaplaceno bereme z amortizace — splátka se po fixaci mění, takže
+  // násobení první splátkou celou dobou splatnosti by úrok zkreslilo.
+  const amortization = buildAmortizationTable(loanAmount, mortgage)
+  let totalPaid = 0
+  let totalInterest = 0
+  for (const row of amortization) {
+    totalPaid += row.payment
+    totalInterest += row.interest
+  }
 
   // Splátka po refixaci — re-amortizace zbylého zůstatku novou sazbou na zbytek doby.
   // null, když fixace pokrývá celý úvěr nebo se sazba nemění.
@@ -85,7 +93,9 @@ export function calcMortgage(
   const totalMonths = mortgage.termYears * 12
   const rateChanges = Math.abs(mortgage.rateAfterFixation - mortgage.interestRate) > 0.001
   let monthlyPaymentAfterFixation: number | null = null
+  let effectiveRateAfterFixation: number | null = null
   if (fixationMonths < totalMonths && rateChanges) {
+    effectiveRateAfterFixation = mortgage.rateAfterFixation
     const balanceAtFixation = calcLoanBalance(
       loanAmount,
       mortgage.interestRate,
@@ -99,5 +109,13 @@ export function calcMortgage(
     )
   }
 
-  return { monthlyPayment, monthlyPaymentAfterFixation, totalInterest, totalPaid, ltv, loanAmount }
+  return {
+    monthlyPayment,
+    monthlyPaymentAfterFixation,
+    effectiveRateAfterFixation,
+    totalInterest,
+    totalPaid,
+    ltv,
+    loanAmount,
+  }
 }
